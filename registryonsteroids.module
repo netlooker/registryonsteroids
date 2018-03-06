@@ -376,7 +376,7 @@ function _registryonsteroids_process_theme_registry(array &$registry, $themes) {
           // Include the file now so functions can be discovered below.
           include_once DRUPAL_ROOT . '/' . $file->uri;
 
-          if (!in_array($file->uri, $registry[$hook]['includes'])) {
+          if (!in_array($file->uri, $registry[$hook]['includes'], TRUE)) {
             $registry[$hook]['includes'][] = $file->uri;
           }
         }
@@ -443,7 +443,7 @@ function _registryonsteroids_registry_sort_phase_functions(array &$functions, $h
     // Only add the function to the array of theme functions if it currently
     // exists in the $functions array.
     $function = $theme . '_' . $phase . '_' . $hook;
-    $key = array_search($function, $functions);
+    $key = array_search($function, $functions, TRUE);
     if ($key !== FALSE) {
       // Save the theme function to be added later, but sorted.
       $theme_functions[$theme][] = $function;
