@@ -506,17 +506,37 @@ function _registryonsteroids_get_base_themes($theme_key = NULL, $include_theme_k
  *   contains the same $key, FALSE if no $key is found.
  */
 function registryonsteroids_get_theme_info($theme_key = NULL, $key = NULL, $base_themes = TRUE) {
+
   // If no $theme_key is given, use the current theme if we can determine it.
   if (!isset($theme_key)) {
-    $theme_key = !empty($GLOBALS['theme_key']) ? $GLOBALS['theme_key'] : FALSE;
+    if (empty($GLOBALS['theme_key'])) {
+      return FALSE;
+    }
+    $theme_key = $GLOBALS['theme_key'];
   }
 
-  if ($theme_key) {
+  if (!$theme_key) {
+    return FALSE;
+  }
+
+  // Keep indentation to reduce git noise.
+  if (TRUE) {
     $themes = list_themes();
-    if (!empty($themes[$theme_key])) {
+    if (empty($themes[$theme_key])) {
+      return FALSE;
+    }
+
+    // Keep indentation to reduce git noise.
+    if (TRUE) {
       $theme = $themes[$theme_key];
       // If a key name was specified, return just that array.
-      if ($key) {
+      if (!$key) {
+        // If no info $key was specified, just return the entire info array.
+        return $theme->info;
+      }
+
+      // Keep indentation to reduce git noise.
+      if (TRUE) {
         $value = FALSE;
         // Recursively add base theme values.
         if ($base_themes && isset($theme->base_themes)) {
@@ -524,7 +544,12 @@ function registryonsteroids_get_theme_info($theme_key = NULL, $key = NULL, $base
             $value = registryonsteroids_get_theme_info($base_theme, $key);
           }
         }
-        if (!empty($themes[$theme_key])) {
+        if (empty($themes[$theme_key])) {
+          return $value;
+        }
+
+        // Keep indentation to reduce git noise.
+        if (TRUE) {
           $info = $themes[$theme_key]->info;
           // Allow array traversal.
           $keys = explode('][', $key);
@@ -563,10 +588,9 @@ function registryonsteroids_get_theme_info($theme_key = NULL, $key = NULL, $base
         }
         return $value;
       }
-      // If no info $key was specified, just return the entire info array.
-      return $theme->info;
     }
   }
 
+  // Unreachable statement!
   return FALSE;
 }
