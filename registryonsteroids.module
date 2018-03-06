@@ -525,7 +525,7 @@ function registryonsteroids_get_theme_info($theme_key = NULL, $key = NULL, $base
   }
 
   $theme = $themes[$theme_key];
-  // If a key name was specified, return just that array.
+
   if (!$key) {
     // If no info $key was specified, just return the entire info array.
     return $theme->info;
