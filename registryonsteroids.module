@@ -363,7 +363,7 @@ function _registryonsteroids_process_theme_registry(array &$registry, $themes) {
         }
 
         // Transform "-" in file names to "_" to match theme hook naming scheme.
-        $hook = strtr($name, '-', '_');
+        $hook = str_replace('-', '_', $name);
 
         // File to be included by core's theme function when a theme hook is
         // invoked.
