@@ -196,7 +196,7 @@ function _registryonsteroids_theme_add_processors($hook, array &$info = array(),
     $info[$phase_key] = array_unique($info[$phase_key]);
 
     // Filter out functions that does not exist.
-    $info[$phase_key] = array_filter($info[$phase_key], 'function_exists');
+    $info[$phase_key] = array_filter($info[$phase_key], '\function_exists');
 
     // Sadly we remove preprocess and process for hooks that provides
     // a theme function. (like the date module with date_display_single).
