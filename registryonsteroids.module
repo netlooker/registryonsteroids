@@ -478,7 +478,9 @@ function _registryonsteroids_get_base_themes($theme_key = NULL, $include_theme_k
   $theme_key = $theme_key ?: $GLOBALS['theme_key'];
 
   if (!isset($themes[$theme_key])) {
-    $themes[$theme_key] = array_unique(array_filter((array) registryonsteroids_get_theme_info($theme_key, 'base theme')));
+    $themes[$theme_key] = array_unique(
+      array_filter(
+        (array) registryonsteroids_get_theme_info($theme_key, 'base theme')));
   }
 
   if ($include_theme_key) {
