@@ -519,78 +519,66 @@ function registryonsteroids_get_theme_info($theme_key = NULL, $key = NULL, $base
     return FALSE;
   }
 
-  // Keep indentation to reduce git noise.
-  if (TRUE) {
-    $themes = list_themes();
-    if (empty($themes[$theme_key])) {
-      return FALSE;
+  $themes = list_themes();
+  if (empty($themes[$theme_key])) {
+    return FALSE;
+  }
+
+  $theme = $themes[$theme_key];
+  // If a key name was specified, return just that array.
+  if (!$key) {
+    // If no info $key was specified, just return the entire info array.
+    return $theme->info;
+  }
+
+  $value = FALSE;
+  // Recursively add base theme values.
+  if ($base_themes && isset($theme->base_themes)) {
+    foreach (array_keys($theme->base_themes) as $base_theme) {
+      $value = registryonsteroids_get_theme_info($base_theme, $key);
     }
+  }
 
-    // Keep indentation to reduce git noise.
-    if (TRUE) {
-      $theme = $themes[$theme_key];
-      // If a key name was specified, return just that array.
-      if (!$key) {
-        // If no info $key was specified, just return the entire info array.
-        return $theme->info;
+  if (empty($themes[$theme_key])) {
+    return $value;
+  }
+
+  $info = $themes[$theme_key]->info;
+  // Allow array traversal.
+  $keys = explode('][', $key);
+  foreach ($keys as $parent) {
+    if (isset($info[$parent])) {
+      $info = $info[$parent];
+    }
+    else {
+      $info = FALSE;
+    }
+  }
+
+  if (is_array($value)) {
+    if (!empty($info)) {
+      if (!is_array($info)) {
+        $info = array($info);
       }
-
-      // Keep indentation to reduce git noise.
-      if (TRUE) {
-        $value = FALSE;
-        // Recursively add base theme values.
-        if ($base_themes && isset($theme->base_themes)) {
-          foreach (array_keys($theme->base_themes) as $base_theme) {
-            $value = registryonsteroids_get_theme_info($base_theme, $key);
-          }
+      $value = drupal_array_merge_deep($value, $info);
+    }
+  }
+  else {
+    if (!empty($info)) {
+      if (empty($value)) {
+        $value = $info;
+      }
+      else {
+        if (!is_array($value)) {
+          $value = array($value);
         }
-        if (empty($themes[$theme_key])) {
-          return $value;
+        if (!is_array($info)) {
+          $info = array($info);
         }
-
-        // Keep indentation to reduce git noise.
-        if (TRUE) {
-          $info = $themes[$theme_key]->info;
-          // Allow array traversal.
-          $keys = explode('][', $key);
-          foreach ($keys as $parent) {
-            if (isset($info[$parent])) {
-              $info = $info[$parent];
-            }
-            else {
-              $info = FALSE;
-            }
-          }
-          if (is_array($value)) {
-            if (!empty($info)) {
-              if (!is_array($info)) {
-                $info = array($info);
-              }
-              $value = drupal_array_merge_deep($value, $info);
-            }
-          }
-          else {
-            if (!empty($info)) {
-              if (empty($value)) {
-                $value = $info;
-              }
-              else {
-                if (!is_array($value)) {
-                  $value = array($value);
-                }
-                if (!is_array($info)) {
-                  $info = array($info);
-                }
-                $value = drupal_array_merge_deep($value, $info);
-              }
-            }
-          }
-        }
-        return $value;
+        $value = drupal_array_merge_deep($value, $info);
       }
     }
   }
 
-  // Unreachable statement!
-  return FALSE;
+  return $value;
 }
