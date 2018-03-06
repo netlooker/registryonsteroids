@@ -539,10 +539,6 @@ function registryonsteroids_get_theme_info($theme_key = NULL, $key = NULL, $base
     }
   }
 
-  if (empty($themes[$theme_key])) {
-    return $value;
-  }
-
   $info = $themes[$theme_key]->info;
   // Allow array traversal.
   $keys = explode('][', $key);
