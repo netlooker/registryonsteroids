@@ -2,8 +2,11 @@
 
 /**
  * Implements hook_module_implements_alter().
+ *
+ * @param array $implementations
+ * @param string $hook
  */
-function registryonsteroids_module_implements_alter(&$implementations, $hook) {
+function registryonsteroids_module_implements_alter(array &$implementations, $hook) {
   if ('theme_registry_alter' === $hook) {
     $group = $implementations['registryonsteroids'];
     unset($implementations['registryonsteroids']);
@@ -13,8 +16,10 @@ function registryonsteroids_module_implements_alter(&$implementations, $hook) {
 
 /**
  * Implements hook_theme_registry_alter().
+ *
+ * @param array $registry
  */
-function registryonsteroids_theme_registry_alter(&$registry) {
+function registryonsteroids_theme_registry_alter(array &$registry) {
   // Retrieve the active theme names.
   $themes = _registryonsteroids_get_base_themes(NULL, TRUE);
 
