@@ -328,18 +328,14 @@ function drupal_get_hook_parents($hook) {
  *
  * @param array[] $registry
  *   The theme registry array, passed by reference.
- * @param string|array $themes
- *   The name of the theme or list of theme names to process.
+ * @param string[] $themes
+ *   Machine names of the themes to process.
  *
  * @see registryonsteroids_theme_registry_alter()
  * @see _theme_process_registry()
  * @see _theme_build_registry()
  */
-function _registryonsteroids_process_theme_registry(array &$registry, $themes) {
-  // Convert to an array if needed.
-  if (is_string($themes)) {
-    $themes = array();
-  }
+function _registryonsteroids_process_theme_registry(array &$registry, array $themes) {
 
   // Processor functions work in two distinct phases with the process
   // functions always being executed after the preprocess functions.
