@@ -21,7 +21,7 @@ function registryonsteroids_module_implements_alter(array &$implementations, $ho
  */
 function registryonsteroids_theme_registry_alter(array &$registry) {
   // Retrieve the active theme names.
-  $themes = _registryonsteroids_get_base_themes(NULL, TRUE);
+  $themes = _registryonsteroids_get_base_themes($GLOBALS['theme_key'], TRUE);
 
   // Process registered hooks in the theme registry.
   _registryonsteroids_process_theme_registry($registry, $themes);
@@ -464,18 +464,15 @@ function _registryonsteroids_registry_sort_phase_functions(array &$functions, $h
  * Returns a list of base themes for active or provided theme.
  *
  * @param string $theme_key
- *   The machine name of the theme to check, if not set the active theme name
- *   will be used.
+ *   The machine name of the theme to find base themes for.
  * @param bool $include_theme_key
  *   Whether to append the returned list with $theme_key.
  *
  * @return array
  *   An indexed array of base themes.
  */
-function _registryonsteroids_get_base_themes($theme_key = NULL, $include_theme_key = FALSE) {
+function _registryonsteroids_get_base_themes($theme_key, $include_theme_key = FALSE) {
   static $themes;
-
-  $theme_key = $theme_key ?: $GLOBALS['theme_key'];
 
   if (!isset($themes[$theme_key])) {
     $themes[$theme_key] = array_unique(
