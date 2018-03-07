@@ -17,7 +17,7 @@ function registryonsteroids_module_implements_alter(array &$implementations, $ho
 /**
  * Implements hook_theme_registry_alter().
  *
- * @param array $registry
+ * @param array[] $registry
  */
 function registryonsteroids_theme_registry_alter(array &$registry) {
   // Retrieve the active theme names.
@@ -45,7 +45,7 @@ function registryonsteroids_theme_registry_alter(array &$registry) {
 /**
  * Registry post process mechanism.
  *
- * @param array $registry
+ * @param array[] $registry
  *   The registry.
  * @param object[] $base_themes
  *   The base themes.
@@ -326,7 +326,7 @@ function drupal_get_hook_parents($hook) {
  *  - `process functions` When a specific theme hook suggestion function
  *    `hook_process_HOOK__SUGGESTION` is found.
  *
- * @param array $registry
+ * @param array[] $registry
  *   The theme registry array, passed by reference.
  * @param string|array $themes
  *   The name of the theme or list of theme names to process.
