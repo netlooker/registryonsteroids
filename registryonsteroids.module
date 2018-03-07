@@ -344,9 +344,9 @@ function _registryonsteroids_process_theme_registry(array &$registry, array $the
     'process functions'    => 'process',
   );
 
-  // Iterate over each theme passed.
-  // Iterate over the [pre]process phases.
-  foreach ($variable_process_phases as $phase_key => $phase) {
+  // Keep indentation to reduce git noise.
+  if (TRUE) {
+    // Iterate over each theme passed.
     foreach ($themes as $theme) {
       // Get the theme's base path.
       $path = drupal_get_path('theme', $theme);
@@ -365,7 +365,8 @@ function _registryonsteroids_process_theme_registry(array &$registry, array $the
         // invoked.
         if (isset($registry[$hook])) {
           $registry[$hook] += array(
-            $phase_key => array(),
+            'preprocess functions' => array(),
+            'process functions' => array(),
             'includes' => array(),
           );
 
@@ -400,12 +401,15 @@ function _registryonsteroids_process_theme_registry(array &$registry, array $the
         $registry[$hook]['type'] = $GLOBALS['theme_path'] === $registry[$hook]['theme path'] ? 'theme' : 'base_theme';
 
         $registry[$hook] += array(
-          $phase_key => array(),
+          'preprocess functions' => array(),
+          'process functions' => array(),
         );
 
         // Sort the phase functions.
         // @see https://www.drupal.org/node/2098551
-        _registryonsteroids_registry_sort_phase_functions($registry[$hook][$phase_key], $hook, $phase, $themes);
+        foreach ($variable_process_phases as $phase_key => $phase) {
+          _registryonsteroids_registry_sort_phase_functions($registry[$hook][$phase_key], $hook, $phase, $themes);
+        }
       }
     }
   }
