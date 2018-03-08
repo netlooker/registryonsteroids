@@ -483,6 +483,79 @@ function _registryonsteroids_get_base_themes($theme_key, $include_theme_key = FA
 }
 
 /**
+ * @param string $theme_key
+ *   Name of the theme to start with.
+ *
+ * @return object[]|false
+ *   Hierarchy of base theme objects, with order as specified in $root_first, or
+ *   FALSE, if the theme itself or any of its ancestors are missing.
+ *   Format:
+ *   [
+ *     'THEMENAME' => $theme,
+ *     'PARENT_NAME' => $parent_theme,
+ *     [..]
+ *     'ROOT_NAME' => $root_theme,
+ *   ]
+ */
+function _registryonsteroids_theme_get_ancestors($theme_key) {
+  /**
+   * @var object[][] $hierarchies_objects
+   *   Format:
+   *   $['THEMENAME'] = [
+   *     'THEMENAME' => $theme,
+   *     'PARENT_NAME' => $parent_theme,
+   *     [..]
+   *     'ROOT_NAME' => $root_theme,
+   *   ]
+   */
+  static $hierarchies_objects = array();
+
+  return isset($hierarchies_objects[$theme_key])
+    ? $hierarchies_objects[$theme_key]
+    : $hierarchies_objects[$theme_key] = _registryonsteroids_theme_collect_ancestors(
+      $theme_key,
+      list_themes());
+}
+
+/**
+ * @param string $theme_key
+ *   Name of the theme to start with.
+ * @param object[] $known_themes
+ *   The result of list_themes()
+ *   This is passed as a parameter to make testing easier.
+ *
+ * @return object[]|false
+ *   Hierarchy of base theme objects, starting with the theme itself.
+ *   E.g. ['mytheme' => $my_theme, 'zen' => $zen]
+ *   FALSE, if the theme itself or any of its ancestors is not in $known_themes.
+ */
+function _registryonsteroids_theme_collect_ancestors($theme_key, array $known_themes) {
+
+  if (!isset($known_themes[$theme_key]->info)) {
+    // The theme does not exist.
+    return FALSE;
+  }
+
+  $hierarchy_objects = array();
+
+  while (TRUE) {
+    if (!isset($known_themes[$theme_key]->info)) {
+      // The hierarchy contains an unknown theme name.
+      return FALSE;
+    }
+    $hierarchy_objects[$theme_key] = $theme = $known_themes[$theme_key];
+    $info = $theme->info;
+    if (empty($info['base theme'])) {
+      // Bottom of the hierarchy is here.
+      break;
+    }
+    $theme_key = $info['base theme'];
+  }
+
+  return $hierarchy_objects;
+}
+
+/**
  * Return information from the .info file of a theme (and possible base themes).
  *
  * @param string $theme_key
