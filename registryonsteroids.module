@@ -21,7 +21,10 @@ function registryonsteroids_module_implements_alter(array &$implementations, $ho
  */
 function registryonsteroids_theme_registry_alter(array &$registry) {
   // Retrieve the active theme names.
-  $themes = _registryonsteroids_get_base_themes($GLOBALS['theme_key'], TRUE);
+  $themes = array_reverse(
+    array_keys(
+      _registryonsteroids_theme_get_ancestors(
+        $GLOBALS['theme_key'])));
 
   // Process registered hooks in the theme registry.
   _registryonsteroids_process_theme_registry($registry, $themes);
@@ -30,10 +33,10 @@ function registryonsteroids_theme_registry_alter(array &$registry) {
   $all_themes = list_themes();
 
   // Compile an array of base themes object.
-  $base_themes = _registryonsteroids_get_base_themes($all_themes[$GLOBALS['theme']]->name, TRUE);
-  $base_themes = array_map(function ($theme) use ($all_themes) {
-    return $all_themes[$theme];
-  }, array_combine($base_themes, $base_themes));
+  $base_themes = array_reverse(
+    _registryonsteroids_theme_get_ancestors(
+      // @ŧodo This is likely the same as $GLOBALS['theme'].
+      $all_themes[$GLOBALS['theme']]->name));
 
   // Extract the current theme.
   $theme = array_pop($base_themes);
