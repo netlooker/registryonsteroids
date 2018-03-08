@@ -54,7 +54,7 @@ function registryonsteroids_theme_registry_alter(array &$registry) {
  */
 function _theme_post_process_registry(array &$registry, array $base_themes, $theme) {
   $prefixes_data = _registryonsteroids_theme_make_prefixes($base_themes, $theme);
-  $themes = array_merge($prefixes_data['theme_engine'], $prefixes_data['base_theme'], $prefixes_data['theme']);
+  $themes = array_merge($prefixes_data['module'], $prefixes_data['theme_engine'], $prefixes_data['base_theme'], $prefixes_data['theme']);
   $grouped_functions = drupal_group_functions_by_prefix();
 
   // Reverse sort the registry.
