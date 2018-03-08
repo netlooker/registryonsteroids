@@ -336,13 +336,9 @@ function drupal_get_hook_parents($hook) {
  * @see _theme_build_registry()
  */
 function _registryonsteroids_process_theme_registry(array &$registry, array $themes) {
-
   // Processor functions work in two distinct phases with the process
   // functions always being executed after the preprocess functions.
-  $variable_process_phases = array(
-    'preprocess functions' => 'preprocess',
-    'process functions'    => 'process',
-  );
+  $variable_process_phases = _registryonsteroids_theme_processors_phases();
 
   // Iterate over each theme passed.
   foreach ($themes as $theme) {
@@ -363,9 +359,11 @@ function _registryonsteroids_process_theme_registry(array &$registry, array $the
       // invoked.
       if (isset($registry[$hook])) {
         $registry[$hook] += array(
-          'preprocess functions' => array(),
-          'process functions' => array(),
           'includes' => array(),
+        );
+        $registry[$hook] += array_combine(
+          array_keys($variable_process_phases),
+          array_fill(0, count($variable_process_phases), array())
         );
 
         // Include the file now so functions can be discovered below.
@@ -398,9 +396,9 @@ function _registryonsteroids_process_theme_registry(array &$registry, array $the
       // Correct the type that is implementing this override.
       $registry[$hook]['type'] = $GLOBALS['theme_path'] === $registry[$hook]['theme path'] ? 'theme' : 'base_theme';
 
-      $registry[$hook] += array(
-        'preprocess functions' => array(),
-        'process functions' => array(),
+      $registry[$hook] += array_combine(
+        array_keys($variable_process_phases),
+        array_fill(0, count($variable_process_phases), array())
       );
 
       // Sort the phase functions.
@@ -559,12 +557,12 @@ function registryonsteroids_get_theme_info($theme_key = NULL, $key = NULL, $base
         $value = $info;
       }
       else {
-        if (!is_array($value)) {
-          $value = array($value);
-        }
+        $value = array($value);
+
         if (!is_array($info)) {
           $info = array($info);
         }
+
         $value = drupal_array_merge_deep($value, $info);
       }
     }
