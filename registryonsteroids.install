@@ -1,0 +1,14 @@
+<?php
+
+/**
+ * Implements hook_uninstall().
+ */
+function registryonsteroids_uninstall() {
+  global $conf;
+
+  foreach (array_keys($conf) as $key) {
+    if (0 === strpos($key, 'registryonsteroids_')) {
+      variable_del($key);
+    }
+  }
+}
