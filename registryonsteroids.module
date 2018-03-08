@@ -344,72 +344,69 @@ function _registryonsteroids_process_theme_registry(array &$registry, array $the
     'process functions'    => 'process',
   );
 
-  // Keep indentation to reduce git noise.
-  if (TRUE) {
-    // Iterate over each theme passed.
-    foreach ($themes as $theme) {
-      // Get the theme's base path.
-      $path = drupal_get_path('theme', $theme);
-      $regexp = '/\.component\.inc$/';
-      // Find theme function overrides.
-      foreach (drupal_system_listing($regexp, $path . '/templates', 'name', 0) as $name => $file) {
-        // Strip off the extension.
-        if (($pos = strpos($name, '.')) !== FALSE) {
-          $name = drupal_substr($name, 0, $pos);
-        }
-
-        // Transform "-" in file names to "_" to match theme hook naming scheme.
-        $hook = str_replace('-', '_', $name);
-
-        // File to be included by core's theme function when a theme hook is
-        // invoked.
-        if (isset($registry[$hook])) {
-          $registry[$hook] += array(
-            'preprocess functions' => array(),
-            'process functions' => array(),
-            'includes' => array(),
-          );
-
-          // Include the file now so functions can be discovered below.
-          include_once DRUPAL_ROOT . '/' . $file->uri;
-
-          if (!in_array($file->uri, $registry[$hook]['includes'], TRUE)) {
-            $registry[$hook]['includes'][] = $file->uri;
-          }
-        }
+  // Iterate over each theme passed.
+  foreach ($themes as $theme) {
+    // Get the theme's base path.
+    $path = drupal_get_path('theme', $theme);
+    $regexp = '/\.component\.inc$/';
+    // Find theme function overrides.
+    foreach (drupal_system_listing($regexp, $path . '/templates', 'name', 0) as $name => $file) {
+      // Strip off the extension.
+      if (($pos = strpos($name, '.')) !== FALSE) {
+        $name = drupal_substr($name, 0, $pos);
       }
 
-      // Process core's normal functionality.
-      _theme_process_registry($registry, $theme, $GLOBALS['theme_key'] === $theme ? 'theme' : 'base_theme', $theme, $path);
+      // Transform "-" in file names to "_" to match theme hook naming scheme.
+      $hook = str_replace('-', '_', $name);
 
-      // Find necessary templates in the theme.
-      $registry = drupal_array_merge_deep($registry, drupal_find_theme_templates($registry, '.tpl.php', $path));
-
-      // Iterate over each registered hook.
-      foreach ($registry as $hook => $info) {
-        // Remove function callbacks if a template was found.
-        if (isset($info['function']) && isset($info['template'])) {
-          unset($registry[$hook]['function']);
-        }
-
-        // Correct template theme paths.
-        if (!isset($info['theme path'])) {
-          $registry[$hook]['theme path'] = $path;
-        }
-
-        // Correct the type that is implementing this override.
-        $registry[$hook]['type'] = $GLOBALS['theme_path'] === $registry[$hook]['theme path'] ? 'theme' : 'base_theme';
-
+      // File to be included by core's theme function when a theme hook is
+      // invoked.
+      if (isset($registry[$hook])) {
         $registry[$hook] += array(
           'preprocess functions' => array(),
           'process functions' => array(),
+          'includes' => array(),
         );
 
-        // Sort the phase functions.
-        // @see https://www.drupal.org/node/2098551
-        foreach ($variable_process_phases as $phase_key => $phase) {
-          _registryonsteroids_registry_sort_phase_functions($registry[$hook][$phase_key], $hook, $phase, $themes);
+        // Include the file now so functions can be discovered below.
+        include_once DRUPAL_ROOT . '/' . $file->uri;
+
+        if (!in_array($file->uri, $registry[$hook]['includes'], TRUE)) {
+          $registry[$hook]['includes'][] = $file->uri;
         }
+      }
+    }
+
+    // Process core's normal functionality.
+    _theme_process_registry($registry, $theme, $GLOBALS['theme_key'] === $theme ? 'theme' : 'base_theme', $theme, $path);
+
+    // Find necessary templates in the theme.
+    $registry = drupal_array_merge_deep($registry, drupal_find_theme_templates($registry, '.tpl.php', $path));
+
+    // Iterate over each registered hook.
+    foreach ($registry as $hook => $info) {
+      // Remove function callbacks if a template was found.
+      if (isset($info['function']) && isset($info['template'])) {
+        unset($registry[$hook]['function']);
+      }
+
+      // Correct template theme paths.
+      if (!isset($info['theme path'])) {
+        $registry[$hook]['theme path'] = $path;
+      }
+
+      // Correct the type that is implementing this override.
+      $registry[$hook]['type'] = $GLOBALS['theme_path'] === $registry[$hook]['theme path'] ? 'theme' : 'base_theme';
+
+      $registry[$hook] += array(
+        'preprocess functions' => array(),
+        'process functions' => array(),
+      );
+
+      // Sort the phase functions.
+      // @see https://www.drupal.org/node/2098551
+      foreach ($variable_process_phases as $phase_key => $phase) {
+        _registryonsteroids_registry_sort_phase_functions($registry[$hook][$phase_key], $hook, $phase, $themes);
       }
     }
   }
