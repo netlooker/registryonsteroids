@@ -459,33 +459,6 @@ function _registryonsteroids_registry_sort_phase_functions(array &$functions, $h
 }
 
 /**
- * Returns a list of base themes for active or provided theme.
- *
- * @param string $theme_key
- *   The machine name of the theme to find base themes for.
- * @param bool $include_theme_key
- *   Whether to append the returned list with $theme_key.
- *
- * @return array
- *   An indexed array of base themes.
- */
-function _registryonsteroids_get_base_themes($theme_key, $include_theme_key = FALSE) {
-  static $themes;
-
-  if (!isset($themes[$theme_key])) {
-    $themes[$theme_key] = array_unique(
-      array_filter(
-        (array) registryonsteroids_get_theme_info($theme_key, 'base theme')));
-  }
-
-  if ($include_theme_key) {
-    $themes[$theme_key][] = $theme_key;
-  }
-
-  return array_unique($themes[$theme_key]);
-}
-
-/**
  * @param string $theme_key
  *   Name of the theme to start with.
  *
