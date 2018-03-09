@@ -84,7 +84,7 @@ function registryonsteroids_theme_registry_alter(array &$registry) {
 function _theme_post_process_registry(array &$registry, array $base_themes, $theme) {
   $prefixes_data = _registryonsteroids_theme_make_prefixes($base_themes, $theme);
   $themes = array_merge($prefixes_data['module'], $prefixes_data['theme_engine'], $prefixes_data['base_theme'], $prefixes_data['theme']);
-  $grouped_functions = drupal_group_functions_by_prefix();
+  $grouped_functions = _registryonsteroids_group_functions_by_prefix();
 
   // Reverse sort the registry.
   krsort($registry);
@@ -195,7 +195,7 @@ function _registryonsteroids_theme_find_processors(array $grouped_functions, arr
  *   The prefixes.
  */
 function _registryonsteroids_theme_add_processors($hook, array &$info = array(), array $prefixes_data = array()) {
-  $hooks_stack = drupal_get_hook_parents($hook);
+  $hooks_stack = _registryonsteroids_hook_get_parents($hook);
 
   foreach (_registryonsteroids_theme_processors_phases() as $phase_key => $phase) {
     $callbacks = array();
@@ -297,7 +297,7 @@ function _registryonsteroids_theme_make_prefixes(array $base_themes, $theme) {
  * @return array
  *   Functions grouped by the first prefix.
  */
-function drupal_group_functions_by_prefix() {
+function _registryonsteroids_group_functions_by_prefix() {
   $functions = get_defined_functions();
   $grouped_functions = array();
 
@@ -319,7 +319,7 @@ function drupal_group_functions_by_prefix() {
  * @return string[]
  *   The parent hooks, e.g. ['aaa__bbb__ccc', 'aaa__bbb', 'aaa'].
  */
-function drupal_get_hook_parents($hook) {
+function _registryonsteroids_hook_get_parents($hook) {
   $parents = array($hook);
 
   // @todo Combination of non-multibyte strrpos() and multibyte drupal_substr()?
