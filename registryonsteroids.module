@@ -1,5 +1,35 @@
 <?php
 
+global $conf;
+
+// Auto-rebuild the theme registry.
+if (variable_get('registryonsteroids_rebuild_registry', FALSE) && !defined('MAINTENANCE_MODE')) {
+  // Rebuild .info data.
+  system_rebuild_theme_data();
+  // Rebuild theme registry.
+  drupal_theme_rebuild();
+}
+
+$conf['theme_debug'] = variable_get('registryonsteroids_theme_debug', FALSE);
+
+/**
+ * Implements hook_menu().
+ */
+function registryonsteroids_menu() {
+  return array(
+    'admin/config/development/registryonsteroids' => array(
+      'title' => 'Registry On Steroïds',
+      'description' => 'Registry On Steroïds configuration',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('_registryonsteroids_admin_settings'),
+      'access arguments' => array(
+        'administer site',
+      ),
+      'file' => 'registryonsteroids.admin.inc',
+    ),
+  );
+}
+
 /**
  * Implements hook_module_implements_alter().
  *
