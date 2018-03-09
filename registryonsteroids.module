@@ -2,7 +2,7 @@
 
 /**
  * @file
- * registryonsteroids.module
+ * Main module file.
  */
 
 global $conf;
@@ -34,11 +34,6 @@ function registryonsteroids_menu() {
     ),
   );
 }
-
-/**
- * @file
- * Main module file.
- */
 
 /**
  * Implements hook_module_implements_alter().
