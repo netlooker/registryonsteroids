@@ -50,17 +50,28 @@ function registryonsteroids_module_implements_alter(array &$implementations, $ho
  * Implements hook_theme_registry_alter().
  */
 function registryonsteroids_theme_registry_alter(array &$registry) {
-  // Get all themes.
-  $all_themes = list_themes();
+  // Figure out which theme this applies to.
+  if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+    $trace = debug_backtrace(0, 3);
+  }
+  else {
+    // Second parameter not supported in PHP < 5.4.0. It would cause a
+    // "Warning: debug_backtrace() expects at most 1 parameter, 2 given".
+    $trace = debug_backtrace(0);
+  }
+  if (!isset($trace[2]['function'], $trace[2]['args'][0]) || '_theme_build_registry' !== $trace[2]['function']) {
+    watchdog(
+      'registryonsteroids',
+      'hook_theme_registry_alter() was called from an unexpected place. We cannot determine which theme this registry belongs to. registryonsteroids functionality might not work.',
+      array(),
+      WATCHDOG_WARNING
+    );
 
-  // Compile an array of base themes object.
-  $base_themes = array_reverse(
-    _registryonsteroids_theme_get_ancestors(
-      // @ŧodo This is likely the same as $GLOBALS['theme'].
-      $all_themes[$GLOBALS['theme']]->name));
+    return;
+  }
 
-  // Extract the current theme.
-  $theme = array_pop($base_themes);
+  /* @see _theme_build_registry() */
+  list($theme, $base_themes) = $trace[2]['args'];
 
   // Apply Registry On Steroids sauce.
   _theme_post_process_registry($registry, $base_themes, $theme);
