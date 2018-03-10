@@ -53,3 +53,27 @@
           template_process
       path: sites/all/themes/registryonsteroids/ros_theme
       includes: { }
+
+-
+  hook: ros2__variant1
+  definition:
+      variables:
+        text: ros_test_theme,
+      template: ros2
+      type: theme
+      theme path: sites/all/themes/registryonsteroids/ros_theme
+      preprocess functions:
+        -
+          template_preprocess
+        -
+          ros_test_preprocess_ros2
+        -
+          ros_test_preprocess_ros2__variant1
+        -
+          ros_theme_preprocess_ros2
+        -
+          ros_theme_preprocess_ros2__variant1
+      process functions:
+        -
+          template_process
+      path: sites/all/themes/registryonsteroids/ros_theme

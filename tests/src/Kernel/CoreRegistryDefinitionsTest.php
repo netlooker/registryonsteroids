@@ -5,16 +5,16 @@ namespace Drupal\Tests\registryonsteroids\Kernel;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Class RegistryDefinitionsTest.
+ * Class CoreRegistryDefinitionsTest.
  */
-class RegistryDefinitionsTest extends AbstractThemeTest {
+class CoreRegistryDefinitionsTest extends AbstractThemeTest {
 
   /**
    * {@inheritdoc}
    */
   protected function setUp() {
     parent::setUp();
-    module_enable(array('registryonsteroids'));
+    module_disable(array('registryonsteroids'));
     drupal_flush_all_caches();
   }
 
@@ -28,6 +28,16 @@ class RegistryDefinitionsTest extends AbstractThemeTest {
 
     $this->assertArrayHasKey($hook, $registry);
     $this->assertEquals($definition, $registry[$hook]);
+  }
+
+  /**
+   * Test the registry definition against the missing definitions.
+   *
+   * @dataProvider registryMissingProvider
+   */
+  public function testMissingRegistryDefinitions($hook) {
+    $registry = theme_get_registry(TRUE);
+    $this->assertArrayNotHasKey($hook, $registry);
   }
 
   /**
@@ -46,7 +56,17 @@ class RegistryDefinitionsTest extends AbstractThemeTest {
    *   List of registry fixtures.
    */
   public function registryProvider() {
-    return Yaml::parseFile(__DIR__ . '/../../fixtures/ros/registry/registry.yml');
+    return Yaml::parseFile(__DIR__ . '/../../fixtures/core/registry/registry.yml');
+  }
+
+  /**
+   * Return registry fixtures that should exist in core but doesn't.
+   *
+   * @return array
+   *   List of registry fixtures.
+   */
+  public function registryMissingProvider() {
+    return Yaml::parseFile(__DIR__ . '/../../fixtures/core/registry/registry_missing.yml');
   }
 
   /**
@@ -56,7 +76,7 @@ class RegistryDefinitionsTest extends AbstractThemeTest {
    *   List of registry fixtures.
    */
   public function renderProvider() {
-    return Yaml::parseFile(__DIR__ . '/../../fixtures/ros/render/render.yml');
+    return Yaml::parseFile(__DIR__ . '/../../fixtures/core/render/render.yml');
   }
 
 }

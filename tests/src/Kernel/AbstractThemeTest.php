@@ -19,6 +19,11 @@ abstract class AbstractThemeTest extends AbstractTest {
 
     $conf['theme_debug'] = FALSE;
     $conf['theme_default'] = 'ros_theme';
+
+    module_disable(array('registryonsteroids'));
+    drupal_flush_all_caches();
+    // module_enable(array('registryonsteroids'));.
+    drupal_flush_all_caches();
   }
 
 }
