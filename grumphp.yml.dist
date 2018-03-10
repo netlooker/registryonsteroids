@@ -12,6 +12,7 @@ parameters:
         - module
         - inc
         - js
+        - install
     git_commit_message:
       enforce_no_subject_trailing_period: false
       max_subject_width: 200
