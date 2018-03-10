@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/drupol/registryonsteroids.svg?branch=7.x-1.x)](https://travis-ci.org/drupol/registryonsteroids)
+
 # Registry On Steroïds
 
 Registry On Steroïds(ROS) fixes a limitation in Drupal 7 core, where some preprocess/process hooks are not properly registered in the theme registry.
