@@ -31,7 +31,6 @@
       process functions:
         -
           template_process
-      includes: { }
 
 -
   hook: ros2
@@ -52,7 +51,6 @@
         -
           template_process
       path: sites/all/themes/registryonsteroids/ros_theme
-      includes: { }
 
 -
   hook: ros2__variant1
