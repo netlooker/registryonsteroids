@@ -121,7 +121,7 @@ function registryonsteroids_alter_page_alter(&$page) {
 /**
  * Implements hook_field_attach_view_alter().
  */
-function atomium_field_attach_view_alter(&$output, $context) {
+function registryonsteroids_field_attach_view_alter(&$output, $context) {
   $suggestion_data = array(
     'field_type',
     'formatter',
