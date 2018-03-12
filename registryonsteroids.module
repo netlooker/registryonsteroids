@@ -89,8 +89,22 @@ function registryonsteroids_theme_registry_alter(array &$registry) {
  */
 function _registryonsteroids_theme_registry_alter(array &$registry, array $base_themes, $theme) {
 
+  /**
+   * @var string[][] $prefixes_by_type
+   *   Format: $[$prefix_type][$prefix] = $prefix
+   */
   $prefixes_by_type = _registryonsteroids_theme_make_prefixes($base_themes, $theme);
+
+  /**
+   * @var string[] $prefixes
+   *   Format: $[$prefix] = $prefix
+   */
   $prefixes = array_merge($prefixes_by_type['module'], $prefixes_by_type['theme_engine'], $prefixes_by_type['base_theme'], $prefixes_by_type['theme']);
+
+  /**
+   * @var string[][] $functions_by_first_fragment
+   *   Format: $[$first_fragment][] = $function
+   */
   $functions_by_first_fragment = _registryonsteroids_group_functions_by_prefix();
 
   // Reverse sort the registry.
