@@ -1,3 +1,4 @@
 name = Registry on steroids
 description = Registry on steroids
 core = 7.x
+configure = admin/config/development/registryonsteroids
