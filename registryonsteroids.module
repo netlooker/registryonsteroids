@@ -88,17 +88,18 @@ function registryonsteroids_theme_registry_alter(array &$registry) {
  *   The current theme.
  */
 function _registryonsteroids_theme_registry_alter(array &$registry, array $base_themes, $theme) {
-  $prefixes_data = _registryonsteroids_theme_make_prefixes($base_themes, $theme);
-  $themes = array_merge($prefixes_data['module'], $prefixes_data['theme_engine'], $prefixes_data['base_theme'], $prefixes_data['theme']);
-  $grouped_functions = _registryonsteroids_group_functions_by_prefix();
+
+  $prefixes_by_type = _registryonsteroids_theme_make_prefixes($base_themes, $theme);
+  $prefixes = array_merge($prefixes_by_type['module'], $prefixes_by_type['theme_engine'], $prefixes_by_type['base_theme'], $prefixes_by_type['theme']);
+  $functions_by_first_fragment = _registryonsteroids_group_functions_by_prefix();
 
   // Reverse sort the registry.
   krsort($registry);
 
   // Iterate over each registered hook.
-  foreach ($registry as $hook => &$info) {
+  foreach ($registry as $theme_hook => &$info) {
     // The pattern to match.
-    $pattern = isset($info['pattern']) ? $info['pattern'] : ($hook . '__');
+    $pattern = isset($info['pattern']) ? $info['pattern'] : ($theme_hook . '__');
 
     // Only process hooks that have not explicitly "turned off" patterns.
     if (empty($pattern)) {
@@ -107,8 +108,8 @@ function _registryonsteroids_theme_registry_alter(array &$registry, array $base_
 
     // Iterate over each themes objects.
     // This is in order: the theme engine, the base theme(s), the current theme.
-    foreach ($themes as $theme_hook) {
-      _registryonsteroids_theme_find_processors($grouped_functions, $registry, $info, $theme_hook, $hook);
+    foreach ($prefixes as $prefix) {
+      _registryonsteroids_theme_find_processors($functions_by_first_fragment, $registry, $info, $prefix, $theme_hook);
 
       // Ensure "theme path" is set.
       $info += array(
@@ -122,7 +123,7 @@ function _registryonsteroids_theme_registry_alter(array &$registry, array $base_
       unset($info['base hook']);
     }
 
-    _registryonsteroids_theme_add_processors($hook, $info, $prefixes_data);
+    _registryonsteroids_theme_add_processors($theme_hook, $info, $prefixes_by_type);
   }
 
   // Reverse sort the registry.
@@ -131,10 +132,10 @@ function _registryonsteroids_theme_registry_alter(array &$registry, array $base_
   // Registry optimization and includes fiddling.
   // This cannot be included in the previous loop as the previous loop
   // might create new members on the fly.
-  foreach ($registry as $hook => &$info) {
+  foreach ($registry as $theme_hook => &$info) {
     // Make sure the includes member of each hook is completed with its
     // parent hook.
-    list($original_hook,) = explode('__', $hook);
+    list($original_hook,) = explode('__', $theme_hook);
     $info += array('includes' => array());
     $registry[$original_hook] += array('includes' => array());
     $info['includes'] = array_unique(
