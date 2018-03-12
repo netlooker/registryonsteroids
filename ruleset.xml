@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<ruleset name="Subsite">
+    <rule ref="vendor/ec-europa/qa-automation/phpcs/SubStandards/QA/ruleset.xml" />
+
+    <rule ref="Drupal.Commenting.InlineComment.DocBlock">
+        <exclude-pattern>**/**</exclude-pattern>
+    </rule>
+</ruleset>
