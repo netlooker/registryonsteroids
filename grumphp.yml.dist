@@ -3,7 +3,7 @@ parameters:
   bin_dir: vendor/bin
   tasks:
     phpcs:
-      standard: vendor/ec-europa/qa-automation/phpcs/SubStandards/QA
+      standard: .
       ignore_patterns:
         - vendor/
         - RoboFile.php
