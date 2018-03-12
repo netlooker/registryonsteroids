@@ -19,6 +19,8 @@ $conf['theme_debug'] = variable_get('registryonsteroids_theme_debug', FALSE);
 
 /**
  * Implements hook_menu().
+ *
+ * @return array[]
  */
 function registryonsteroids_menu() {
   return array(
@@ -37,6 +39,10 @@ function registryonsteroids_menu() {
 
 /**
  * Implements hook_module_implements_alter().
+ *
+ * @param mixed[] $implementations
+ *   Format: $[$module] = $group
+ * @param string $hook
  */
 function registryonsteroids_module_implements_alter(array &$implementations, $hook) {
   if ('theme_registry_alter' === $hook) {
@@ -48,6 +54,9 @@ function registryonsteroids_module_implements_alter(array &$implementations, $ho
 
 /**
  * Implements hook_theme_registry_alter().
+ *
+ * @param array[] $registry
+ *   Format: $[$theme_hook] = $info
  */
 function registryonsteroids_theme_registry_alter(array &$registry) {
   // Figure out which theme this applies to.
