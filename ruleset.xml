@@ -5,4 +5,21 @@
     <rule ref="Drupal.Commenting.InlineComment.DocBlock">
         <exclude-pattern>**/**</exclude-pattern>
     </rule>
+
+    <rule ref="Drupal.Commenting.HookComment.HookParamDoc">
+        <exclude-pattern>**/**</exclude-pattern>
+    </rule>
+    <rule ref="Drupal.Commenting.HookComment.HookReturnDoc">
+        <exclude-pattern>**/**</exclude-pattern>
+    </rule>
+
+    <rule ref="Drupal.Commenting.FunctionComment.ParamCommentFullStop">
+        <exclude-pattern>**/**</exclude-pattern>
+    </rule>
+    <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment">
+        <exclude-pattern>**/**</exclude-pattern>
+    </rule>
+    <rule ref="Drupal.Commenting.FunctionComment.MissingParamComment">
+        <exclude-pattern>**/**</exclude-pattern>
+    </rule>
 </ruleset>
