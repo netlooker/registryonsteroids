@@ -51,7 +51,7 @@ function registryonsteroids_module_implements_alter(array &$implementations, $ho
  */
 function registryonsteroids_theme_registry_alter(array &$registry) {
   // Figure out which theme this applies to.
-  if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+  if (PHP_VERSION_ID >= 50400) {
     $trace = debug_backtrace(0, 3);
   }
   else {
@@ -89,8 +89,22 @@ function registryonsteroids_theme_registry_alter(array &$registry) {
  */
 function _registryonsteroids_theme_registry_alter(array &$registry, array $base_themes, $theme) {
 
+  /**
+   * @var string[][] $prefixes_by_type
+   *   Format: $[$prefix_type][$prefix] = $prefix
+   */
   $prefixes_by_type = _registryonsteroids_theme_make_prefixes($base_themes, $theme);
+
+  /**
+   * @var string[] $prefixes
+   *   Format: $[$prefix] = $prefix
+   */
   $prefixes = array_merge($prefixes_by_type['module'], $prefixes_by_type['theme_engine'], $prefixes_by_type['base_theme'], $prefixes_by_type['theme']);
+
+  /**
+   * @var string[][] $functions_by_first_fragment
+   *   Format: $[$first_fragment][] = $function
+   */
   $functions_by_first_fragment = _registryonsteroids_group_functions_by_prefix();
 
   // Reverse sort the registry.
@@ -183,18 +197,25 @@ function _registryonsteroids_theme_find_processors(array $functions_by_first_fra
 
     // Grep only the functions which are within the prefix group.
     list($first_prefix,) = explode('_', $prefix, 2);
-    if (isset($functions_by_first_fragment[$first_prefix]) && ($matches = preg_grep(
-        '/^' . $prefix . '_' . $pattern . '/',
-        $functions_by_first_fragment[$first_prefix]
-      ))) {
-      foreach ($matches as $match) {
-        // Determine the current theme implementation.
-        $base_hook = drupal_substr($match, drupal_strlen($prefix) + 1);
 
-        if (!isset($registry[$base_hook])) {
-          $registry[$base_hook] = $info;
-          $registry[$base_hook]['type'] = 'theme';
-        }
+    if (!isset($functions_by_first_fragment[$first_prefix])) {
+      continue;
+    }
+
+    if (!$matches = preg_grep(
+      '/^' . $prefix . '_' . $pattern . '/',
+      $functions_by_first_fragment[$first_prefix]
+    )) {
+      continue;
+    }
+
+    foreach ($matches as $match) {
+      // Determine the current theme implementation.
+      $base_hook = drupal_substr($match, drupal_strlen($prefix) + 1);
+
+      if (!isset($registry[$base_hook])) {
+        $registry[$base_hook] = $info;
+        $registry[$base_hook]['type'] = 'theme';
       }
     }
   }
