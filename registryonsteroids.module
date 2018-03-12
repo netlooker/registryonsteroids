@@ -279,8 +279,9 @@ function _registryonsteroids_theme_processors_phases() {
  *
  * @see https://api.drupal.org/api/drupal/includes!theme.inc/function/theme/7.x
  *
- * @return array
+ * @return string[][]
  *   The prefixes.
+ *   Format: $[$prefix_type][$prefix] = $prefix
  */
 function _registryonsteroids_theme_make_prefixes(array $base_themes, $theme) {
   return array(
