@@ -197,18 +197,25 @@ function _registryonsteroids_theme_find_processors(array $functions_by_first_fra
 
     // Grep only the functions which are within the prefix group.
     list($first_prefix,) = explode('_', $prefix, 2);
-    if (isset($functions_by_first_fragment[$first_prefix]) && ($matches = preg_grep(
-        '/^' . $prefix . '_' . $pattern . '/',
-        $functions_by_first_fragment[$first_prefix]
-      ))) {
-      foreach ($matches as $match) {
-        // Determine the current theme implementation.
-        $base_hook = drupal_substr($match, drupal_strlen($prefix) + 1);
 
-        if (!isset($registry[$base_hook])) {
-          $registry[$base_hook] = $info;
-          $registry[$base_hook]['type'] = 'theme';
-        }
+    if (!isset($functions_by_first_fragment[$first_prefix])) {
+      continue;
+    }
+
+    if (!$matches = preg_grep(
+      '/^' . $prefix . '_' . $pattern . '/',
+      $functions_by_first_fragment[$first_prefix]
+    )) {
+      continue;
+    }
+
+    foreach ($matches as $match) {
+      // Determine the current theme implementation.
+      $base_hook = drupal_substr($match, drupal_strlen($prefix) + 1);
+
+      if (!isset($registry[$base_hook])) {
+        $registry[$base_hook] = $info;
+        $registry[$base_hook]['type'] = 'theme';
       }
     }
   }
