@@ -51,7 +51,7 @@ function registryonsteroids_module_implements_alter(array &$implementations, $ho
  */
 function registryonsteroids_theme_registry_alter(array &$registry) {
   // Figure out which theme this applies to.
-  if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+  if (PHP_VERSION_ID >= 50400) {
     $trace = debug_backtrace(0, 3);
   }
   else {
