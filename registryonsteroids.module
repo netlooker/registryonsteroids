@@ -98,11 +98,16 @@ function registryonsteroids_theme_registry_alter(array &$registry) {
  */
 function _registryonsteroids_theme_registry_alter(array &$registry, array $base_themes, $theme) {
 
+  $dts = [];
+  $t0 = microtime(TRUE);
+
   /**
    * @var string[][] $prefixes_by_type
    *   Format: $[$prefix_type][$prefix] = $prefix
    */
   $prefixes_by_type = _registryonsteroids_theme_make_prefixes($base_themes, $theme);
+
+  $t0 += ($dts['make prefixes'] = microtime(TRUE) - $t0);
 
   /**
    * @var string[] $prefixes
@@ -116,8 +121,12 @@ function _registryonsteroids_theme_registry_alter(array &$registry, array $base_
    */
   $functions_by_first_fragment = _registryonsteroids_group_functions_by_prefix();
 
+  $t0 += ($dts['group functions'] = microtime(TRUE) - $t0);
+
   // Reverse sort the registry.
   krsort($registry);
+
+  $t0 += ($dts['ksort 0'] = microtime(TRUE) - $t0);
 
   // Iterate over each registered hook.
   foreach ($registry as $theme_hook => &$info) {
@@ -155,8 +164,12 @@ function _registryonsteroids_theme_registry_alter(array &$registry, array $base_
     _registryonsteroids_theme_add_processors($theme_hook, $info, $prefixes_by_type);
   }
 
+  $t0 += ($dts['first loop'] = microtime(TRUE) - $t0);
+
   // Reverse sort the registry.
   krsort($registry);
+
+  $t0 += ($dts['ksort 1'] = microtime(TRUE) - $t0);
 
   // Registry optimization and includes fiddling.
   // This cannot be included in the previous loop as the previous loop
@@ -178,8 +191,18 @@ function _registryonsteroids_theme_registry_alter(array &$registry, array $base_
     $info = array_filter($info);
   }
 
+  $t0 += ($dts['second loop'] = microtime(TRUE) - $t0);
+
   // Sort the registry.
   ksort($registry);
+
+  $t0 += ($dts['ksort 2'] = microtime(TRUE) - $t0);
+
+  $dts_ms = array_map(function($sec) {
+    return number_format($sec * 1000, 3);
+  }, $dts);
+
+  dpm($dts_ms, __FUNCTION__);
 }
 
 /**
