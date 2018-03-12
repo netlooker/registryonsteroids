@@ -162,38 +162,38 @@ function _registryonsteroids_theme_registry_alter(array &$registry, array $base_
 /**
  * Find the processors callbacks.
  *
- * @param array $grouped_functions
- *   An array of grouped functions.
- * @param array $cache
- *   The registry.
+ * @param array $functions_by_first_fragment
+ *   An functions from get_defined_functions(), grouped by first fragment.
+ * @param array $registry
+ *   The theme registry being processed.
  * @param array $info
  *   The current hook data.
- * @param string $theme
- *   The current theme name.
+ * @param string $prefix
+ *   A prefix, e.g. a module name or theme name.
  * @param string $hook
- *   The current hook.
+ *   The theme hook being processed.
  */
-function _registryonsteroids_theme_find_processors(array $grouped_functions, array &$cache, array &$info, $theme, $hook) {
+function _registryonsteroids_theme_find_processors(array $functions_by_first_fragment, array &$registry, array &$info, $prefix, $hook) {
   // The pattern to match.
   $pattern = isset($info['pattern']) ? $info['pattern'] : ($hook . '__');
 
   foreach (_registryonsteroids_theme_processors_phases() as $phase) {
     // Find functions matching the specific theme and phase prefix.
-    $prefix = $theme . '_' . $phase;
+    $prefix = $prefix . '_' . $phase;
 
     // Grep only the functions which are within the prefix group.
     list($first_prefix,) = explode('_', $prefix, 2);
-    if (isset($grouped_functions[$first_prefix]) && ($matches = preg_grep(
+    if (isset($functions_by_first_fragment[$first_prefix]) && ($matches = preg_grep(
         '/^' . $prefix . '_' . $pattern . '/',
-        $grouped_functions[$first_prefix]
+        $functions_by_first_fragment[$first_prefix]
       ))) {
       foreach ($matches as $match) {
         // Determine the current theme implementation.
         $base_hook = drupal_substr($match, drupal_strlen($prefix) + 1);
 
-        if (!isset($cache[$base_hook])) {
-          $cache[$base_hook] = $info;
-          $cache[$base_hook]['type'] = 'theme';
+        if (!isset($registry[$base_hook])) {
+          $registry[$base_hook] = $info;
+          $registry[$base_hook]['type'] = 'theme';
         }
       }
     }
