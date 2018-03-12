@@ -109,7 +109,13 @@ function _registryonsteroids_theme_registry_alter(array &$registry, array $base_
     // Iterate over each themes objects.
     // This is in order: the theme engine, the base theme(s), the current theme.
     foreach ($prefixes as $prefix) {
-      _registryonsteroids_theme_find_processors($functions_by_first_fragment, $registry, $info, $prefix, $theme_hook);
+      _registryonsteroids_theme_find_processors(
+        $functions_by_first_fragment,
+        $registry,
+        $info,
+        $prefix,
+        $theme_hook
+      );
 
       // Ensure "theme path" is set.
       $info += array(
