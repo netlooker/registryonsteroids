@@ -294,6 +294,37 @@ function _registryonsteroids_theme_processors_phases() {
   );
 }
 
+function _testme() {
+
+  $all_themes = list_themes();
+  $theme = $all_themes['seven'];
+  $base_themes = [$theme];
+
+  $user_functions = get_defined_functions()['user'];
+
+  /**
+   * @var string[][] $prefixes_by_type
+   *   Format: $[$prefix_type][$prefix] = $prefix
+   */
+  $prefixes_by_type = _registryonsteroids_theme_make_prefixes($base_themes, $theme);
+
+  /**
+   * @var string[] $prefixes
+   *   Format: $[$prefix] = $prefix
+   */
+  $prefixes = array_merge($prefixes_by_type['module'], $prefixes_by_type['theme_engine'], $prefixes_by_type['base_theme'], $prefixes_by_type['theme']);
+
+  $t0 = microtime(TRUE);
+  $functionss_by_hook_and_phase_with_inheritance = _registryonsteroids_group_functions_by_hook_and_phase_and_weight_with_inheritance(
+    $user_functions,
+    $prefixes);
+  $t1 = microtime(TRUE);
+
+  dpm(($t1 - $t0) * 1000, 'milliseconds');
+
+  dpm($functionss_by_hook_and_phase_with_inheritance);
+}
+
 /**
  * Compile a list of prefixes.
  *
