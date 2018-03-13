@@ -2,7 +2,7 @@ drupal:
   core: "7"
   base_url: "http://127.0.0.1:8888"
   site:
-    profile: minimal
+    profile: standard
   database:
     host: "127.0.0.1"
     port: "3306"
