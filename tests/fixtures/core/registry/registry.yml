@@ -7,19 +7,13 @@
       type: module
       theme path: sites/all/modules/registryonsteroids/tests/modules/ros_test
       preprocess functions:
-        -
-          template_preprocess
-        -
-          contextual_preprocess
-        -
-          ros_test_preprocess_ros0
+        - template_preprocess
+        - contextual_preprocess
+        - ros_test_preprocess_ros0
       process functions:
-        -
-          template_process
-        -
-          rdf_process
-        -
-          ros_test_process_ros0
+        - template_process
+        - rdf_process
+        - ros_test_process_ros0
 
 -
   hook: ros1
@@ -30,19 +24,13 @@
       type: module
       theme path: sites/all/modules/registryonsteroids/tests/modules/ros_test
       preprocess functions:
-        -
-          template_preprocess
-        -
-          contextual_preprocess
-        -
-          ros_test_preprocess_ros1
+        - template_preprocess
+        - contextual_preprocess
+        - ros_test_preprocess_ros1
       process functions:
-        -
-          template_process
-        -
-          rdf_process
-        -
-          ros_test_process_ros1
+        - template_process
+        - rdf_process
+        - ros_test_process_ros1
 
 -
   hook: ros2
@@ -53,19 +41,12 @@
       type: theme_engine
       theme path: sites/all/themes/registryonsteroids/ros_theme
       preprocess functions:
-        -
-          template_preprocess
-        -
-          contextual_preprocess
-        -
-          ros_test_preprocess_ros2
-        -
-          ros_theme_preprocess_ros2
+        - template_preprocess
+        - contextual_preprocess
+        - ros_test_preprocess_ros2
+        - ros_theme_preprocess_ros2
       process functions:
-        -
-          template_process
-        -
-          rdf_process
-        -
-          ros_test_process_ros2
+        - template_process
+        - rdf_process
+        - ros_test_process_ros2
       path: sites/all/themes/registryonsteroids/ros_theme
