@@ -65,3 +65,45 @@ function ros_test_preprocess_ros2(&$variables, $hook) {
 function ros_test_preprocess_ros2__variant1(&$variables, $hook) {
   $variables['text'] .= __FUNCTION__ . ',';
 }
+
+/**
+ * Implements hook_process_hook().
+ */
+function ros_test_process_ros0(&$variables, $hook) {
+  $variables['text'] .= __FUNCTION__ . ',';
+}
+
+/**
+ * Implements hook_process_hook().
+ */
+function ros_test_process_ros1(&$variables, $hook) {
+  $variables['text'] .= __FUNCTION__ . ',';
+}
+
+/**
+ * Implements hook_process_hook().
+ */
+function ros_test_process_ros1__variant1(&$variables, $hook) {
+  $variables['text'] .= __FUNCTION__ . ',';
+}
+
+/**
+ * Implements hook_process_hook().
+ */
+function ros_test_process_ros2(&$variables, $hook) {
+  $variables['text'] .= __FUNCTION__ . ',';
+}
+
+/**
+ * Implements hook_process_hook().
+ */
+function ros_test_process_ros2__variant1(&$variables, $hook) {
+  $variables['text'] .= __FUNCTION__ . ',';
+}
+
+/**
+ * Implements hook_process_hook().
+ */
+function ros_test_process_ros2__variant2(&$variables, $hook) {
+  $variables['text'] .= __FUNCTION__ . ',';
+}
