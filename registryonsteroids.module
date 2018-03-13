@@ -186,7 +186,7 @@ function _registryonsteroids_theme_registry_alter(array &$registry, array $base_
  * Find the processors callbacks.
  *
  * @param array $functions_by_first_fragment
- *   An functions from get_defined_functions(), grouped by first fragment.
+ *   Functions from get_defined_functions(), keyed by first fragment.
  * @param array $registry
  *   The theme registry being processed.
  * @param array $info
