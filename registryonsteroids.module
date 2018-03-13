@@ -202,17 +202,17 @@ function _registryonsteroids_theme_find_processors(array $functions_by_first_fra
 
   foreach (_registryonsteroids_theme_processors_phases() as $phase) {
     // Find functions matching the specific theme and phase prefix.
-    $prefix = $prefix . '_' . $phase;
+    $prefix_with_phase = $prefix . '_' . $phase;
 
     // Grep only the functions which are within the prefix group.
-    list($first_prefix,) = explode('_', $prefix, 2);
+    list($first_prefix,) = explode('_', $prefix_with_phase, 2);
 
     if (!isset($functions_by_first_fragment[$first_prefix])) {
       continue;
     }
 
     if (!$matches = preg_grep(
-      '/^' . $prefix . '_' . $pattern . '/',
+      '/^' . $prefix_with_phase . '_' . $pattern . '/',
       $functions_by_first_fragment[$first_prefix]
     )) {
       continue;
@@ -220,7 +220,7 @@ function _registryonsteroids_theme_find_processors(array $functions_by_first_fra
 
     foreach ($matches as $match) {
       // Determine the current theme implementation.
-      $base_hook = drupal_substr($match, drupal_strlen($prefix) + 1);
+      $base_hook = drupal_substr($match, drupal_strlen($prefix_with_phase) + 1);
 
       if (!isset($registry[$base_hook])) {
         $registry[$base_hook] = $info;
