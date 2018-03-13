@@ -37,6 +37,10 @@ function registryonsteroids_menu() {
   );
 }
 
+function registryonsteroids_preprocess_page__foo(array &$variables) {
+
+}
+
 /**
  * Implements hook_module_implements_alter().
  *
