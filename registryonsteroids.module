@@ -86,8 +86,35 @@ function registryonsteroids_theme_registry_alter(array &$registry) {
   /* @see _theme_build_registry() */
   list($theme, $base_themes) = $trace[2]['args'];
 
+  _registryonsteroids_print_normalized_registry($registry, __DIR__ . '/before.php');
+
   // Apply Registry On Steroids sauce.
   _registryonsteroids_theme_registry_alter($registry, $base_themes, $theme);
+
+  _registryonsteroids_print_normalized_registry($registry, __DIR__ . '/after.php');
+}
+
+/**
+ * DO NOT MERGE THIS!!
+ *
+ * @param array[] $registry
+ * @param string $file
+ */
+function _registryonsteroids_print_normalized_registry(array $registry, string $file) {
+  ksort($registry);
+  foreach ($registry as $hook => &$info) {
+    ksort($info);
+    foreach (_registryonsteroids_theme_processors_phases() as $phase_key => $phase) {
+      if (empty($info[$phase_key])) {
+        unset($info[$phase_key]);
+      }
+      else {
+        $info[$phase_key] = array_values($info[$phase_key]);
+      }
+    }
+  }
+  $export = "<?php\n\nreturn " . var_export($registry, TRUE) . "\n";
+  file_put_contents($file, $export);
 }
 
 /**
