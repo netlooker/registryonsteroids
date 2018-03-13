@@ -113,8 +113,53 @@ function _registryonsteroids_print_normalized_registry(array $registry, string $
     }
     ksort($info);
   }
-  $export = "<?php\n\nreturn " . var_export($registry, TRUE) . "\n";
+
+  $export = "<?php\n\nreturn " . _registryonsteroids_export_value($registry) . "\n";
   file_put_contents($file, $export);
+}
+
+/**
+ * @param mixed $value
+ * @param string $indent
+ *
+ * @return string
+ */
+function _registryonsteroids_export_value($value, $indent = '') {
+  return is_array($value)
+    ? _registryonsteroids_export_array($value, $indent)
+    : var_export($value, TRUE);
+}
+
+/**
+ * @param array $array
+ * @param string $indent
+ *
+ * @return string
+ */
+function _registryonsteroids_export_array(array $array, $indent = '') {
+
+  $indent2 = $indent . '    ';
+
+  $php = '';
+  if (array_values($array) === $array) {
+    // This array has regular "serial" keys.
+    foreach ($array as $v) {
+      $php .= "\n" . $indent2
+        . _registryonsteroids_export_value($v, $indent2)
+        . ',';
+    }
+  }
+  else {
+    foreach ($array as $k => $v) {
+      $php .= "\n" . $indent2
+        .   var_export($k, TRUE)
+        . ' => '
+        . _registryonsteroids_export_value($v, $indent2)
+        . ',';
+    }
+  }
+
+  return 'array(' . $php . "\n" . $indent . ')';
 }
 
 /**
