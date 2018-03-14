@@ -15,23 +15,29 @@
 -
   hook: ros2
   render:
+    - _ros_test_preprocess_ros2_custom_prepend
     - ros_test_preprocess_ros2
     - ros_theme_preprocess_ros2
+    - _ros_test_preprocess_ros2_custom_append
     - ros_test_process_ros2
     - "[..]/themes/ros_theme/ros2.tpl.php"
 
 -
   hook: ros2__variant1
   render:
+    - _ros_test_preprocess_ros2_custom_prepend
     - ros_test_preprocess_ros2
     - ros_theme_preprocess_ros2
+    - _ros_test_preprocess_ros2_custom_append
     - ros_test_process_ros2
     - "[..]/themes/ros_theme/ros2.tpl.php"
 
 -
   hook: ros2__variant2
   render:
+    - _ros_test_preprocess_ros2_custom_prepend
     - ros_test_preprocess_ros2
     - ros_theme_preprocess_ros2
+    - _ros_test_preprocess_ros2_custom_append
     - ros_test_process_ros2
     - "[..]/themes/ros_theme/ros2.tpl.php"
