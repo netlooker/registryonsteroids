@@ -96,7 +96,6 @@ function registryonsteroids_theme_registry_alter(array &$registry) {
  *   The current theme.
  */
 function _registryonsteroids_theme_registry_alter(array &$registry, array $base_themes, $theme) {
-
   /**
    * @var string[][] $prefixes_by_type
    *   Format: $[$prefix_type][$prefix] = $prefix
