@@ -37,8 +37,8 @@ class RegistryDefinitionsTest extends AbstractThemeTest {
    */
   public function testPreprocessProcessCascade($hook, $render) {
     $this->assertEquals(
-      str_replace(',', "\n", $render),
-      str_replace(',', "\n", theme($hook));
+      "\n" . str_replace(',', "\n", $render),
+      "\n" . str_replace(',', "\n", theme($hook)));
   }
 
   /**
