@@ -46,9 +46,8 @@ function registryonsteroids_menu() {
  */
 function registryonsteroids_module_implements_alter(array &$implementations, $hook) {
   if ('theme_registry_alter' === $hook) {
-    $group = $implementations['registryonsteroids'];
     unset($implementations['registryonsteroids']);
-    $implementations['registryonsteroids'] = $group;
+    $implementations = array('registryonsteroids' => FALSE) + $implementations;
   }
 }
 
