@@ -3,12 +3,14 @@
   render:
     - ros_test_preprocess_ros0
     - ros_test_process_ros0
+    - "[..]/modules/ros_test/ros0.tpl.php"
 
 -
   hook: ros1
   render:
     - ros_test_preprocess_ros1
     - ros_test_process_ros1
+    - "[..]/modules/ros_test/ros1.tpl.php"
 
 -
   hook: ros2
@@ -16,6 +18,7 @@
     - ros_test_preprocess_ros2
     - ros_theme_preprocess_ros2
     - ros_test_process_ros2
+    - "[..]/themes/ros_theme/ros2.tpl.php"
 
 -
   hook: ros2__variant1
@@ -26,6 +29,7 @@
     - ros_theme_preprocess_ros2__variant1
     - ros_test_process_ros2
     - ros_test_process_ros2__variant1
+    - "[..]/themes/ros_theme/ros2.tpl.php"
 
 -
   hook: ros2__variant2
@@ -34,3 +38,4 @@
     - ros_theme_preprocess_ros2
     - ros_test_process_ros2
     - ros_test_process_ros2__variant2
+    - "[..]/themes/ros_theme/ros2.tpl.php"
