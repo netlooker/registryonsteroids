@@ -12,19 +12,19 @@ function ros_test_theme() {
   return array(
     'ros0' => array(
       'variables' => array(
-        'callbacks' => array(__FUNCTION__),
+        'callbacks' => array(),
       ),
       'template' => 'ros0',
     ),
     'ros1' => array(
       'variables' => array(
-        'callbacks' => array(__FUNCTION__),
+        'callbacks' => array(),
       ),
       'template' => 'ros1',
     ),
     'ros2' => array(
       'variables' => array(
-        'callbacks' => array(__FUNCTION__),
+        'callbacks' => array(),
       ),
       'template' => 'ros2',
     ),
