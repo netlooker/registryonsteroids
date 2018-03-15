@@ -5,4 +5,4 @@
  * Template file.
  */
 ?>
-<?php print $text; ?>
+<?php print implode("\n", $callbacks); ?>

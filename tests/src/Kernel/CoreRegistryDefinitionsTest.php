@@ -48,7 +48,7 @@ class CoreRegistryDefinitionsTest extends AbstractThemeTest {
   public function testPreprocessProcessCascade($hook, $render) {
     $this->assertEquals(
       "\n" . implode("\n", $render) . "\n",
-      "\n" . str_replace(',', "\n", theme($hook)));
+      "\n" . theme($hook) . "\n");
   }
 
   /**
