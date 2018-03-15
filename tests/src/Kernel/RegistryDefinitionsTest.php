@@ -27,7 +27,7 @@ class RegistryDefinitionsTest extends AbstractThemeTest {
     $registry = theme_get_registry(TRUE);
 
     $this->assertArrayHasKey($hook, $registry);
-    $this->assertEquals($definition, $registry[$hook]);
+    $this->assertEqualThemeRegistryEntries($definition, $registry[$hook]);
   }
 
   /**
