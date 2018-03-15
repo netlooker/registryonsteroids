@@ -28,7 +28,25 @@ function ros_test_theme() {
       ),
       'template' => 'ros2',
     ),
+    'ros3' => array(
+      'variables' => array(
+        'callbacks' => array(),
+      ),
+      // This one has a theme function.
+    ),
   );
+}
+
+/**
+ * Default theme implementation for theme('ros3').
+ *
+ * @param array $variables
+ *
+ * @return string
+ */
+function theme_ros3(array $variables) {
+  $variables['callbacks'][] = __FUNCTION__;
+  return implode("\n", $variables['callbacks']);
 }
 
 /**
@@ -60,6 +78,13 @@ function ros_test_theme_registry_alter(array &$theme_registry) {
 
     // Normalize array keys.
     $theme_registry['ros2']['preprocess functions'] = array_values($theme_registry['ros2']['preprocess functions']);
+  }
+
+  if (isset($theme_registry['ros3'])) {
+
+    // Append a preprocess function.
+    // This one does not match the pattern "*_preprocess_HOOK".
+    $theme_registry['ros3']['preprocess functions'][] = '_ros_test_phase0_ro_s3_custom_append';
   }
 }
 
@@ -102,6 +127,16 @@ function _ros_test_preprocess_ros2_custom_append(array &$variables, $hook) {
  * @param string $hook
  */
 function _ros_test_phase0_ro_s2_custom_append(array &$variables, $hook) {
+  $variables['callbacks'][] = __FUNCTION__;
+}
+
+/**
+ * This callback is appended in ros_test_theme_registry_alter()
+ *
+ * @param array $variables
+ * @param string $hook
+ */
+function _ros_test_phase0_ro_s3_custom_append(array &$variables, $hook) {
   $variables['callbacks'][] = __FUNCTION__;
 }
 

@@ -51,3 +51,15 @@
     - ros_test_process_ros2
     - ros_test_process_ros2__variant2
     - "[..]/themes/ros_theme/ros2.tpl.php"
+
+-
+  hook: ros3
+  render:
+    # Missing: _ros_test_phase0_ro_s3_custom_append
+    - theme_ros3
+
+-
+  hook: ros3__variant1
+  render:
+    # Missing: _ros_test_phase0_ro_s3_custom_append
+    - theme_ros3
