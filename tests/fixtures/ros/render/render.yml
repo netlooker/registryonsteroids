@@ -20,6 +20,7 @@
     - ros_theme_preprocess_ros2
     - _ros_test_preprocess_ros2_custom_prepend  # This belongs further up.
     - _ros_test_preprocess_ros2_custom_append
+    - _ros_test_phase0_ro_s2_custom_append
     - ros_test_process_ros2
     - "[..]/themes/ros_theme/ros2.tpl.php"
 
@@ -33,6 +34,7 @@
     - ros_theme_preprocess_ros2__variant1
     - _ros_test_preprocess_ros2_custom_prepend  # This belongs further up.
     - _ros_test_preprocess_ros2_custom_append
+    - _ros_test_phase0_ro_s2_custom_append
     - ros_test_process_ros2
     - ros_test_process_ros2__variant1
     - "[..]/themes/ros_theme/ros2.tpl.php"
@@ -45,6 +47,7 @@
     - ros_theme_preprocess_ros2
     - _ros_test_preprocess_ros2_custom_prepend  # This belongs further up.
     - _ros_test_preprocess_ros2_custom_append
+    - _ros_test_phase0_ro_s2_custom_append
     - ros_test_process_ros2
     - ros_test_process_ros2__variant2
     - "[..]/themes/ros_theme/ros2.tpl.php"

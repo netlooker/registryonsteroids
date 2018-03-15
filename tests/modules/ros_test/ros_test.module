@@ -54,6 +54,10 @@ function ros_test_theme_registry_alter(array &$theme_registry) {
     // Append a preprocess function.
     $theme_registry['ros2']['preprocess functions'][] = '_ros_test_preprocess_ros2_custom_append';
 
+    // Append another preprocess function.
+    // This one does not match the pattern "*_preprocess_HOOK".
+    $theme_registry['ros2']['preprocess functions'][] = '_ros_test_phase0_ro_s2_custom_append';
+
     // Normalize array keys.
     $theme_registry['ros2']['preprocess functions'] = array_values($theme_registry['ros2']['preprocess functions']);
   }
@@ -86,6 +90,18 @@ function _ros_test_preprocess_ros2_custom_prepend(array &$variables, $hook) {
  * @param string $hook
  */
 function _ros_test_preprocess_ros2_custom_append(array &$variables, $hook) {
+  $variables['callbacks'][] = __FUNCTION__;
+}
+
+/**
+ * This callback is appended in ros_test_theme_registry_alter()
+ *
+ * Unlike the previous one, its function name does not match 'preprocess_HOOK'.
+ *
+ * @param array $variables
+ * @param string $hook
+ */
+function _ros_test_phase0_ro_s2_custom_append(array &$variables, $hook) {
   $variables['callbacks'][] = __FUNCTION__;
 }
 

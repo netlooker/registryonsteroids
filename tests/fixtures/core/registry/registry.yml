@@ -47,6 +47,7 @@
         - ros_test_preprocess_ros2
         - ros_theme_preprocess_ros2
         - _ros_test_preprocess_ros2_custom_append
+        - _ros_test_phase0_ro_s2_custom_append
       process functions:
         - template_process
         - rdf_process
