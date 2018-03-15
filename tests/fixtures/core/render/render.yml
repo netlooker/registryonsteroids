@@ -1,21 +1,18 @@
 -
   hook: ros0
   render:
-    - ros_test_theme
     - ros_test_preprocess_ros0
     - ros_test_process_ros0
 
 -
   hook: ros1
   render:
-    - ros_test_theme
     - ros_test_preprocess_ros1
     - ros_test_process_ros1
 
 -
   hook: ros2
   render:
-    - ros_test_theme
     - ros_test_preprocess_ros2
     - ros_theme_preprocess_ros2
     - ros_test_process_ros2
@@ -23,7 +20,6 @@
 -
   hook: ros2__variant1
   render:
-    - ros_test_theme
     - ros_test_preprocess_ros2
     - ros_theme_preprocess_ros2
     - ros_test_process_ros2
@@ -31,7 +27,6 @@
 -
   hook: ros2__variant2
   render:
-    - ros_test_theme
     - ros_test_preprocess_ros2
     - ros_theme_preprocess_ros2
     - ros_test_process_ros2

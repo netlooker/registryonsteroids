@@ -2,7 +2,7 @@
   hook: ros0
   definition:
       variables:
-        text: ros_test_theme,
+        callbacks: { }
       template: sites/all/modules/registryonsteroids/tests/modules/ros_test/ros0
       type: module
       theme path: sites/all/modules/registryonsteroids/tests/modules/ros_test
@@ -19,7 +19,7 @@
   hook: ros1
   definition:
       variables:
-        text: ros_test_theme,
+        callbacks: { }
       template: sites/all/modules/registryonsteroids/tests/modules/ros_test/ros1
       type: module
       theme path: sites/all/modules/registryonsteroids/tests/modules/ros_test
@@ -36,7 +36,7 @@
   hook: ros2
   definition:
       variables:
-        text: ros_test_theme,
+        callbacks: { }
       template: ros2
       type: theme_engine
       theme path: sites/all/themes/registryonsteroids/ros_theme
@@ -55,7 +55,7 @@
   hook: ros2__variant1
   definition:
       variables:
-        text: ros_test_theme,
+        callbacks: { }
       template: ros2
       type: theme
       theme path: sites/all/themes/registryonsteroids/ros_theme
@@ -77,7 +77,7 @@
   hook: ros2__variant2
   definition:
       variables:
-        text: ros_test_theme,
+        callbacks: { }
       template: ros2
       type: theme
       theme path: sites/all/themes/registryonsteroids/ros_theme
