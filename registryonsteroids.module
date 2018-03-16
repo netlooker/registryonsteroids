@@ -45,9 +45,303 @@ function registryonsteroids_menu() {
  * @param string $hook
  */
 function registryonsteroids_module_implements_alter(array &$implementations, $hook) {
+
   if ('theme_registry_alter' === $hook) {
-    unset($implementations['registryonsteroids']);
-    $implementations = array('registryonsteroids' => FALSE) + $implementations;
+
+    /* @see _registryonsteroids_first_theme_registry_alter() */
+    $implementations = array('_registryonsteroids_first' => FALSE) + $implementations;
+
+    /* @see _registryonsteroids_last_theme_registry_alter() */
+    $implementations['_registryonsteroids_last'] = FALSE;
+  }
+}
+
+/**
+ * Callback for hook_theme_registry_alter().
+ *
+ * @param array[] $registry
+ *   Format: $[$theme_hook] = $info
+ */
+function _registryonsteroids_first_theme_registry_alter(array &$registry) {
+  // Figure out which theme this applies to.
+  if (PHP_VERSION_ID >= 50400) {
+    $trace = debug_backtrace(0, 3);
+  }
+  else {
+    // Second parameter not supported in PHP < 5.4.0. It would cause a
+    // "Warning: debug_backtrace() expects at most 1 parameter, 2 given".
+    $trace = debug_backtrace(0);
+  }
+  if (!isset($trace[2]['function'], $trace[2]['args'][0])
+    || '_theme_build_registry' !== $trace[2]['function']) {
+    watchdog(
+      'registryonsteroids',
+      'hook_theme_registry_alter() was called from an unexpected place. We cannot determine which theme this registry belongs to. registryonsteroids functionality might not work.',
+      [],
+      WATCHDOG_WARNING
+    );
+
+    return;
+  }
+
+  /* @see _theme_build_registry() */
+  list($theme, $base_themes) = $trace[2]['args'];
+
+  // Include all files registered as 'include' for theme hooks, so that
+  // get_defined_functions() finds all preprocess functions.
+  $include_files_map = array();
+  foreach ($registry as $info) {
+    if (isset($info['includes'])) {
+      foreach ($info['includes'] as $include_file) {
+        $include_files_map[$include_file] = $include_file;
+      }
+    }
+  }
+
+  foreach ($include_files_map as $include_file) {
+    include_once DRUPAL_ROOT . '/' . $include_file;
+  }
+
+  $user_functions = get_defined_functions()['user'];
+
+  /**
+   * @var string[][] $prefixes_by_type
+   *   Format: $[$prefix_type][$prefix] = $prefix
+   */
+  $prefixes_by_type = _registryonsteroids_theme_make_prefixes($base_themes, $theme);
+
+  /**
+   * @var string[] $prefixes
+   *   Format: $[$prefix] = $prefix
+   */
+  $prefixes = array_merge(...array_values($prefixes_by_type));
+
+  // Apply Registry On Steroids sauce.
+  _registryonsteroids_first_theme_registry_do_alter($registry, $base_themes, $theme, $user_functions, $prefixes);
+}
+
+/**
+ * @param array[] $registry
+ * @param object[] $base_themes
+ * @param object $theme
+ * @param string[] $user_functions
+ * @param string[] $prefixes
+ */
+function _registryonsteroids_first_theme_registry_do_alter(array &$registry, array $base_themes, $theme, array $user_functions, array $prefixes) {
+
+  $functions_by_hook_and_phase_and_weight = _registryonsteroids_group_functions_by_hook_and_phase_and_weight($user_functions, $prefixes);
+
+  $declared_hooks = array_keys($registry);
+  $declared_hooks = array_combine($declared_hooks, $declared_hooks);
+
+  $declared_base_hooks = array();
+  $declared_root_hooks = array();
+  foreach ($registry as $hook => $info) {
+    if (isset($info['base hook']) && $hook !== $info['base hook']) {
+      $base_hook = $info['base hook'];
+      $declared_base_hooks[$hook] = $base_hook;
+    }
+    else {
+      $declared_root_hooks[$hook] = $hook;
+    }
+  }
+  unset($hook, $info, $Base_hook);
+
+  $discovered_hooks = array_keys($functions_by_hook_and_phase_and_weight);
+  $discovered_hooks = array_combine($discovered_hooks, $discovered_hooks);
+  $discovered_undeclared_hooks = array_diff_key($discovered_hooks, $declared_hooks);
+  $discovered_undeclared_variants = preg_grep('__', $discovered_undeclared_hooks);
+
+  $sortme = array();
+  foreach (array($declared_hooks, $discovered_undeclared_hooks) as $hooks) {
+    foreach ($hooks as $hook) {
+      $sortme[$hook . '__'] = $hook;
+      $sortme[$hook . '__|'] = FALSE;
+    }
+    unset($hook);
+  }
+  unset($hooks);
+
+  ksort($sortme);
+
+  $trail = array();
+  $base_hooks = $declared_base_hooks;
+  $cascades = array();
+  $parent = '*';
+  $base_hook = '*';
+  $cascade = array();
+  foreach ($sortme as $key => $hook_or_false) {
+
+    // Invariants:
+    // - $cascade is the cascade of $parent
+    // - $base_hook is the base hook of $parent
+    //   (with $base_hook === $parent, if it is a "root" hook)
+    // - $cascades[$trail[$i]] is known for each $i in $trail.
+    // - $base_hooks[$trail[$i]] is known for each $i in $trail.
+
+    if (FALSE === $hook_or_false) {
+      $parent = array_pop($trail);
+      $cascade = $cascades[$parent];
+      $base_hook = $base_hooks[$parent];
+      continue;
+    }
+    # $parents[$hook_or_false] = $parent;
+    $trail[] = $parent;
+    $parent = $hook_or_false;
+    if (isset($declared_root_hooks[$parent])) {
+      $cascade = array($parent);
+      $base_hook = $parent;
+    }
+    elseif (!isset($base_hooks[$parent])) {
+      $cascade[] = $parent;
+      // $base_hook stays the same.
+    }
+    elseif ($base_hook === $base_hooks[$parent]) {
+      $cascade[] = $parent;
+      // $base_hook stays the same.
+    }
+    else {
+      $base_hook = $base_hooks[$parent];
+      $cascade = array($base_hook, $parent);
+    }
+    $cascades[$parent] = $cascade;
+    $base_hooks[$parent] = $base_hook;
+  }
+  unset($key, $hook_or_false, $parent, $base_hook, $cascade, $trail);
+
+  $undeclared_base_hooks = array();
+  $registry_entries_to_add = array();
+  foreach ($discovered_undeclared_variants as $undeclared_variant) {
+    $base_hook = $undeclared_variant;
+    while (!isset($registry[$base_hook])) {
+      if (FALSE === $pos = strrpos($base_hook, '__')) {
+        break 2;
+      }
+      $base_hook = substr($base_hook, 0, $pos);
+      unset($pos);
+    }
+    $base_hook_info = $registry[$base_hook];
+    while (!empty($base_hook_info['base hook'])) {
+      $base_hook = $base_hook_info['base hook'];
+      if (!isset($registry[$base_hook])) {
+        break 2;
+      }
+      $base_hook_info = $registry[$base_hook];
+    }
+    $registry_entry = $base_hook_info;
+    $registry_entry['base hook'] = $base_hook;
+    $registry_entries_to_add[$undeclared_variant] = $registry_entry;
+    $undeclared_base_hooks[$undeclared_variant] = $base_hook;
+  }
+  unset($undeclared_variant, $base_hook, $base_hook_info, $registry_entry);
+
+  $registry += $registry_entries_to_add;
+
+  $functionss_accum_by_basehook_and_phasekey_and_weight = array();
+  foreach ($functions_by_hook_and_phase_and_weight['*'] as $phase => $functions_by_weight) {
+    $phase_key = $phase . ' functions';
+    foreach ($declared_root_hooks as $hook) {
+      if (!empty($registry[$hook]['template'])) {
+        foreach ($functions_by_weight as $weight => $function) {
+          $functionss_accum_by_basehook_and_phasekey_and_weight[$hook][$phase_key][$weight][] = $function;
+        }
+        unset($weight, $function);
+      }
+    }
+    unset($phase_key, $hook);
+  }
+  unset($phase, $functions_by_weight);
+
+  $removabless_by_hook_and_phasekey = array();
+  foreach ($functions_by_hook_and_phase_and_weight as $hook => $functions_by_phase_and_weight) {
+    if ('*' === $hook) {
+      continue;
+    }
+    $base_hook = $base_hooks[$hook];
+    $cascade = $cascades[$hook];
+    array_pop($cascade);
+    foreach ($functions_by_phase_and_weight as $phase => $functions_by_weight) {
+      $phase_key = $phase . ' functions';
+      foreach ($functions_by_weight as $weight => $function) {
+        $functionss_accum_by_basehook_and_phasekey_and_weight[$base_hook][$phase_key][$weight][] = $function;
+        foreach ($cascade as $ancestor) {
+          $registry[$ancestor]['registryonsteroids unset'][$phase_key][] = $function;
+          $removabless_by_hook_and_phasekey[$ancestor][$phase_key][] = $function;
+        }
+        unset($ancestor);
+      }
+      unset($weight, $function);
+    }
+    unset($base_hook, $cascade, $functions_by_weight, $phase_key);
+  }
+  unset($hook, $functions_by_phase_and_weight);
+
+  $descendantss = array();
+  foreach ($base_hooks as $hook => $base_hook) {
+    $descendantss[$base_hook][$hook] = $hook;
+  }
+  unset($hook, $base_hook);
+
+  foreach ($functionss_accum_by_basehook_and_phasekey_and_weight as $hook => $functionss_by_phasekey_and_weight) {
+    if ('*' === $hook) {
+      continue;
+    }
+    foreach ($functionss_by_phasekey_and_weight as $phase_key => $functionss_by_weight) {
+      ksort($functionss_by_weight);
+      $phase_functions = array_merge(...$functionss_by_weight);
+      $phase_functions_original = $registry[$hook][$phase_key] ?? [];
+      $phase_functions_map = array_combine($phase_functions, $phase_functions);
+      $phase_functions_original_map = array_combine($phase_functions_original, $phase_functions_original);
+      if ($phase_functions !== $phase_functions_original) {
+        $diff = array_diff_key($phase_functions_map, $phase_functions_original_map);
+        $diff1 = array_diff_key($phase_functions_original_map, $phase_functions_map);;
+        $info = $registry[$hook] ?? NULL;
+        $x = 5;
+      }
+      $registry[$hook][$phase_key] = array_merge(...$functionss_by_weight);
+    }
+  }
+}
+
+/**
+ * Callback for hook_theme_registry_alter().
+ *
+ * @param array[] $registry
+ *   Format: $[$theme_hook] = $info
+ */
+function _registryonsteroids_last_theme_registry_alter(array &$registry) {
+
+  foreach ($registry as $hook => &$info) {
+
+    if (!isset($info['registryonsteroids unset'])) {
+      continue;
+    }
+
+    if (isset($info['base hook'])) {
+      $base_hook = $info['base hook'];
+      if (!isset($registry[$base_hook])) {
+        // @todo Log this.
+        continue;
+      }
+      $base_hook_info = $registry[$base_hook];
+      foreach (array('preprocess functions', 'process functions') as $phase_key) {
+        $info[$phase_key] = isset($base_hook_info[$phase_key])
+          ? $base_hook_info[$phase_key]
+          : array();
+      }
+    }
+
+    foreach ($info['registryonsteroids unset'] as $phase_key => $functions_to_remove) {
+      if (empty($info[$phase_key])) {
+        continue;
+      }
+      $info[$phase_key] = array_values(
+        array_diff(
+          $info[$phase_key],
+          $functions_to_remove));
+    }
+
+    unset($info['registryonsteroids unset']);
   }
 }
 
