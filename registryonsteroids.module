@@ -463,11 +463,12 @@ function _registryonsteroids_group_functions_by_prefix_and_phase_filtered(array 
  */
 function _registryonsteroids_group_functions_by_prefix_and_phase(array $user_functions) {
 
-  $candidate_functions = preg_grep('/process_/', $user_functions);
+  $candidate_functions = preg_grep('/process/', $user_functions);
 
   $functions_by_prefix_and_phase = [];
   foreach (array('preprocess', 'process') as $phase) {
     $needle = '_' . $phase . '_';
+
     $phase_functions = preg_grep('/_' . $phase . '_/', $candidate_functions);
     foreach ($phase_functions as $function) {
       $fragments = explode($needle, $function);
@@ -491,6 +492,13 @@ function _registryonsteroids_group_functions_by_prefix_and_phase(array $user_fun
         $functions_by_prefix_and_phase[$prefix][$phase][$hook] = $function;
         $prefix .= $needle . array_shift($fragments);
       }
+    }
+
+    $phase_functions = preg_grep('/_' . $phase . '$/', $candidate_functions);
+    $substr_length = -strlen($phase) - 1;
+    foreach ($phase_functions as $function) {
+      $prefix = substr($function, 0, $substr_length);
+      $functions_by_prefix_and_phase[$prefix][$phase]['*'] = $function;
     }
   }
 
