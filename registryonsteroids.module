@@ -355,27 +355,33 @@ function _registryonsteroids_group_functions_by_hook_and_phase_with_inheritance(
   ksort($functions_by_hook_and_phase_and_weight_extended);
 
   $keys = array_keys($functions_by_hook_and_phase_and_weight_extended);
+  $keymap = array_flip($keys);
+  $skipmap = array();
+  foreach ($keys as $i => $key) {
+    $entry = $functions_by_hook_and_phase_and_weight_extended[$key];
+    if (TRUE === $entry || FALSE === $entry) {
+      $skipmap[$i] = TRUE;
+    }
+  }
 
   $functionss_by_hook_and_phase_and_weight_with_inheritance = array();
   foreach ($keys as $i => $key) {
-    if (TRUE === $functions_by_hook_and_phase_and_weight_extended[$key]) {
-      $end_key = $key . '|';
-      $parent_hook = $keys[$i - 1];
-      $parent_hook_functions_by_phase_and_weight = $functions_by_hook_and_phase_and_weight_extended[$parent_hook];
-      $affected_hooks = array($parent_hook);
-      for ($j = $i + 1; $end_key !== $keys[$j]; ++$j) {
-        $child_key = $keys[$j];
-        if (FALSE === $functions_by_hook_and_phase_and_weight_extended[$child_key] || TRUE === $functions_by_hook_and_phase_and_weight_extended[$child_key]) {
-          continue;
-        }
-        // Add child hook.
-        $affected_hooks[] = $keys[$j];
+    if (TRUE !== $functions_by_hook_and_phase_and_weight_extended[$key]) {
+      continue;
+    }
+    $end_key = $key . '|';
+    $i_end = $keymap[$end_key];
+    $parent_hook = $keys[$i - 1];
+    $parent_hook_functions_by_phase_and_weight = $functions_by_hook_and_phase_and_weight_extended[$parent_hook];
+
+    for ($j = $i - 1; $j < $i_end; ++$j) {
+      if (isset($skipmap[$j])) {
+        continue;
       }
-      foreach ($affected_hooks as $affected_hook) {
-        foreach ($parent_hook_functions_by_phase_and_weight as $phase => $functions_by_weight) {
-          foreach ($functions_by_weight as $weight => $function) {
-            $functionss_by_hook_and_phase_and_weight_with_inheritance[$affected_hook][$phase][$weight][] = $function;
-          }
+      $hook_j = $keys[$j];
+      foreach ($parent_hook_functions_by_phase_and_weight as $phase => $functions_by_weight) {
+        foreach ($functions_by_weight as $weight => $function) {
+          $functionss_by_hook_and_phase_and_weight_with_inheritance[$hook_j][$phase][$weight][] = $function;
         }
       }
     }
