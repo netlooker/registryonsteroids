@@ -141,10 +141,11 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
   $declared_base_hooks = array();
   $declared_root_hooks = array();
   foreach ($registry as $hook => $info) {
-    $declared_root_hooks[$hook] = $hook;
     if (isset($info['base hook']) && $hook !== $info['base hook']) {
-      $declared_root_hooks[$hook] = $hook;
       $declared_base_hooks[$hook] = $info['base hook'];
+    }
+    else {
+      $declared_root_hooks[$hook] = $hook;
     }
   }
   unset($hook, $info);
