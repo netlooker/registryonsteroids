@@ -200,11 +200,7 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
       $cascade = array($parent);
       $base_hook = $parent;
     }
-    elseif (!isset($base_hooks[$parent])) {
-      $cascade[] = $parent;
-      // $base_hook stays the same.
-    }
-    elseif ($base_hook === $base_hooks[$parent]) {
+    elseif (!isset($base_hooks[$parent]) || $base_hook === $base_hooks[$parent]) {
       $cascade[] = $parent;
       // $base_hook stays the same.
     }
