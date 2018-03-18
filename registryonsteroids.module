@@ -190,7 +190,6 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
     //   (with $base_hook === $parent, if it is a "root" hook)
     // - $cascades[$trail[$i]] is known for each $i in $trail.
     // - $base_hooks[$trail[$i]] is known for each $i in $trail.
-
     if (FALSE === $hook_or_false) {
       $parent = array_pop($trail);
       $cascade = $cascades[$parent];
@@ -229,7 +228,7 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
       if (FALSE === $pos = strrpos($base_hook, '__')) {
         break 2;
       }
-      $base_hook = substr($base_hook, 0, $pos);
+      $base_hook = drupal_substr($base_hook, 0, $pos);
       unset($pos);
     }
     $base_hook_info = $registry[$base_hook];
@@ -630,9 +629,9 @@ function _registryonsteroids_group_functions_by_prefix_and_phase(array $user_fun
     }
 
     $phase_functions = preg_grep('/_' . $phase . '$/', $candidate_functions);
-    $substr_length = -strlen($phase) - 1;
+    $substr_length = -drupal_strlen($phase) - 1;
     foreach ($phase_functions as $function) {
-      $prefix = substr($function, 0, $substr_length);
+      $prefix = drupal_substr($function, 0, $substr_length);
       $functions_by_prefix_and_phase[$prefix][$phase]['*'] = $function;
     }
   }

@@ -60,7 +60,7 @@
       variables:
         callbacks: { }
       template: ros2
-      type: theme
+      type: theme_engine
       theme path: sites/all/themes/registryonsteroids/ros_theme
       preprocess functions:
         - _ros_test_preprocess_ros2_custom_prepend
@@ -85,7 +85,7 @@
       variables:
         callbacks: { }
       template: ros2
-      type: theme
+      type: theme_engine
       theme path: sites/all/themes/registryonsteroids/ros_theme
       preprocess functions:
         - _ros_test_preprocess_ros2_custom_prepend
