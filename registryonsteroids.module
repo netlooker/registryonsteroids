@@ -104,8 +104,6 @@ function _registryonsteroids_first_theme_registry_alter(array &$registry) {
 
   $user_functions = get_defined_functions()['user'];
 
-  $template_preprocess_nestedbox_exists = function_exists('template_preprocess_nestedbox');
-
   /**
    * @var string[][] $prefixes_by_type
    *   Format: $[$prefix_type][$prefix] = $prefix
@@ -166,7 +164,6 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
 
   ksort($sortme);
 
-  # $parents = array();
   $trail = array();
   $base_hooks = $declared_base_hooks;
   $cascades = array();
@@ -343,6 +340,8 @@ function _registryonsteroids_last_theme_registry_alter(array &$registry) {
           $info[$phase_key],
           $functions_to_remove));
     }
+
+    unset($info['registryonsteroids unset']);
   }
 }
 
