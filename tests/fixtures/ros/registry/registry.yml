@@ -44,7 +44,7 @@
         - template_preprocess
         - contextual_preprocess
         - ros_test_preprocess_ros2
-        - system_preprocess_ros2
+        - system_preprocess_ros2  # This should be removed, but isn't.
         - ros_theme_preprocess_ros2
         - _ros_test_preprocess_ros2_custom_prepend  # This belongs further up.
         - _ros_test_preprocess_ros2_custom_append
@@ -68,7 +68,7 @@
         - contextual_preprocess
         - ros_test_preprocess_ros2
         - ros_test_preprocess_ros2__variant1
-        - system_preprocess_ros2
+        - system_preprocess_ros2  # This should be removed, but isn't.
         - ros_theme_preprocess_ros2
         - ros_theme_preprocess_ros2__variant1
         - _ros_test_preprocess_ros2_custom_prepend  # This belongs further up.
@@ -93,7 +93,7 @@
         - template_preprocess
         - contextual_preprocess
         - ros_test_preprocess_ros2
-        - system_preprocess_ros2
+        - system_preprocess_ros2  # This should be removed, but isn't.
         - ros_theme_preprocess_ros2
         - _ros_test_preprocess_ros2_custom_prepend  # This belongs further up.
         - _ros_test_preprocess_ros2_custom_append
