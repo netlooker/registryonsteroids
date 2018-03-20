@@ -147,7 +147,6 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
       $declared_base_hooks[$hook] = $info['base hook'];
     }
   }
-  unset($hook, $info);
 
   $discovered_hooks = array_keys($functions_by_hook_and_phase_and_weight);
   $discovered_hooks = array_combine($discovered_hooks, $discovered_hooks);
@@ -167,9 +166,7 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
       $sortme[$hook . '__'] = $hook;
       $sortme[$hook . '__|'] = FALSE;
     }
-    unset($hook);
   }
-  unset($hooks);
 
   ksort($sortme);
 
@@ -179,7 +176,7 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
   $parent = '*';
   $base_hook = '*';
   $cascade = array();
-  foreach ($sortme as $key => $hook_or_false) {
+  foreach ($sortme as $hook_or_false) {
     // Invariants:
     // - $cascade is the cascade of $parent
     // - $base_hook is the base hook of $parent
@@ -214,7 +211,6 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
     $cascades[$parent] = $cascade;
     $base_hooks[$parent] = $base_hook;
   }
-  unset($key, $hook_or_false, $parent, $base_hook, $cascade, $trail);
 
   $registry_entries_to_add = array();
   foreach ($discovered_undeclared_variants as $undeclared_variant) {
@@ -224,7 +220,6 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
         break 2;
       }
       $base_hook = drupal_substr($base_hook, 0, $pos);
-      unset($pos);
     }
     $base_hook_info = $registry[$base_hook];
     while (!empty($base_hook_info['base hook'])) {
@@ -238,7 +233,6 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
     $registry_entry['base hook'] = $base_hook;
     $registry_entries_to_add[$undeclared_variant] = $registry_entry;
   }
-  unset($undeclared_variant, $base_hook, $base_hook_info, $registry_entry);
 
   $registry += $registry_entries_to_add;
 
@@ -270,11 +264,8 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
       foreach ($functions_by_weight as $weight => $function) {
         $functionss_accum_by_basehook_and_phasekey_and_weight[$base_hook][$phase_key][$weight][] = $function;
       }
-      unset($weight, $function);
     }
-    unset($base_hook, $cascade, $functions_by_weight, $phase_key);
   }
-  unset($hook, $functions_by_phase_and_weight);
 
   foreach (_registryonsteroids_theme_processors_phases() as $phase_key => $phase) {
     $phase_template_root_functions_r = isset($functions_r_by_hook_and_phase['*'][$phase])
@@ -286,7 +277,7 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
     $removables_r_by_hook = array();
     $removables_r = array();
 
-    foreach ($sortme as $key => $hook_or_false) {
+    foreach ($sortme as $hook_or_false) {
       if (FALSE === $hook_or_false) {
         $parent = array_pop($trail);
         $removables_r = $removables_r_by_hook[$parent];
@@ -326,7 +317,6 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
       $removables_r_by_hook[$parent] = $removables_r;
       $registry[$parent]['registryonsteroids unset'][$phase_key] = $removables_r;
     }
-    unset($key, $hook_or_false, $parent, $base_hook, $trail, $removables_r);
   }
 
   foreach ($functionss_accum_by_basehook_and_phasekey_and_weight as $hook => $functionss_by_phasekey_and_weight) {
@@ -617,44 +607,4 @@ function _registryonsteroids_group_functions_by_prefix_and_phase(array $user_fun
   }
 
   return $functions_by_prefix_and_phase;
-}
-
-/**
- * Group all user functions by word before first underscore.
- *
- * @return array
- *   Functions grouped by the first prefix.
- */
-function _registryonsteroids_group_functions_by_prefix() {
-  $functions = get_defined_functions();
-  $functions_by_first_fragment = array();
-
-  // Splitting user defined functions into groups by the first prefix.
-  foreach ($functions['user'] as $function) {
-    list($first_fragment,) = explode('_', $function, 2);
-    $functions_by_first_fragment[$first_fragment][] = $function;
-  }
-
-  return $functions_by_first_fragment;
-}
-
-/**
- * Gets the parents of a hook.
- *
- * @param string $hook
- *   The hook, e.g. 'aaa__bbb__ccc'.
- *
- * @return string[]
- *   The parent hooks, e.g. ['aaa__bbb__ccc', 'aaa__bbb', 'aaa'].
- */
-function _registryonsteroids_hook_get_parents($hook) {
-  $parents = array($hook);
-
-  // @todo Combination of non-multibyte strrpos() and multibyte drupal_substr()?
-  while ($pos = strrpos($hook, '__')) {
-    // In theory, drupal_substr() can return FALSE. But not here. Promise.
-    $parents[] = $hook = drupal_substr($hook, 0, $pos);
-  }
-
-  return $parents;
 }
