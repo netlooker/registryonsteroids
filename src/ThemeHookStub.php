@@ -34,10 +34,7 @@ class ThemeHookStub {
    * @var string[][]
    *   Format: $[$phase_key][$weight][] = $placeholder_or_function
    */
-  private $placeholderssByPhasekeyAndWeight = array(
-    'process functions' => array(),
-    'preprocess functions' => array(),
-  );
+  private $placeholderssByPhasekeyAndWeight = array();
 
   /**
    * @var string[][]
@@ -61,6 +58,10 @@ class ThemeHookStub {
     $root->baseHook = $hook;
     $root->cascade = array($hook);
     $root->baseHookStub = $root;
+    // Remove original process/preprocess functions.
+    // They will be replaced later.
+    unset($info['process functions']);
+    unset($info['preprocess functions']);
     $root->info = $info;
     foreach ($templateFunctionsByPhasekeyAndWeight as $phase_key => $functionsByWeight) {
       foreach ($functionsByWeight as $weight => $function) {
@@ -97,12 +98,11 @@ class ThemeHookStub {
       }
     }
     if (NULL !== $info) {
+      // Remove original process/preprocess functions.
+      // They will be replaced later.
+      unset($info['process functions']);
+      unset($info['preprocess functions']);
       $variant->info = $info;
-    }
-    else {
-      // Do not inherit processor functions yet. This happens later.
-      unset($variant->info['process functions']);
-      unset($variant->info['preprocess functions']);
     }
     $variant->info['base hook'] = $this->baseHook;
     $variant->placeholderssByPhasekeyAndWeight = array();
