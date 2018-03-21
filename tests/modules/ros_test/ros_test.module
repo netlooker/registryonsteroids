@@ -55,6 +55,10 @@ function theme_ros3(array $variables) {
  * @param array $theme_registry
  */
 function ros_test_theme_registry_alter(array &$theme_registry) {
+
+  // Save the intermediate theme registry for later testing.
+  variable_set('ros_test_intermediate_theme_registry', $theme_registry);
+
   if (isset($theme_registry['ros2'])) {
     // Make sure that the key is set.
     $theme_registry['ros2'] += array('preprocess functions' => array());
