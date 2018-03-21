@@ -45,9 +45,9 @@
         - template_preprocess
         - contextual_preprocess
         - ros_test_preprocess_ros2
-        - @ros_test_preprocess_ros2__variant1
+        - "@ros_test_preprocess_ros2__variant1"
         - ros_theme_preprocess_ros2
-        - @ros_theme_preprocess_ros2__variant1
+        - "@ros_theme_preprocess_ros2__variant1"
         - _ros_test_preprocess_ros2_custom_append
         - _ros_test_phase0_ro_s2_custom_append
       process functions:
@@ -64,21 +64,12 @@
       template: ros2
       type: theme_engine
       theme path: sites/all/themes/registryonsteroids/ros_theme
-      preprocess functions:
-        - _ros_test_preprocess_ros2_custom_prepend
-        - template_preprocess
-        - contextual_preprocess
-        - ros_test_preprocess_ros2
-        - ros_test_preprocess_ros2__variant1
-        - ros_theme_preprocess_ros2
-        - ros_theme_preprocess_ros2__variant1
-        - _ros_test_preprocess_ros2_custom_append
-        - _ros_test_phase0_ro_s2_custom_append
-      process functions:
-        - template_process
-        - rdf_process
-        - ros_test_process_ros2
-        - ros_test_process_ros2__variant1
+      registryonsteroids replace:
+        preprocess functions:
+          "@ros_test_preprocess_ros2__variant1": ros_test_preprocess_ros2__variant1
+          "@ros_theme_preprocess_ros2__variant1": ros_theme_preprocess_ros2__variant1
+        process functions:
+          "@ros_test_process_ros2__variant1": ros_test_process_ros2__variant1
       path: sites/all/themes/registryonsteroids/ros_theme
 
 -
@@ -89,19 +80,9 @@
       template: ros2
       type: theme_engine
       theme path: sites/all/themes/registryonsteroids/ros_theme
-      preprocess functions:
-        - _ros_test_preprocess_ros2_custom_prepend
-        - template_preprocess
-        - contextual_preprocess
-        - ros_test_preprocess_ros2
-        - ros_theme_preprocess_ros2
-        - _ros_test_preprocess_ros2_custom_append
-        - _ros_test_phase0_ro_s2_custom_append
-      process functions:
-        - template_process
-        - rdf_process
-        - ros_test_process_ros2
-        - ros_test_process_ros2__variant2
+      registryonsteroids replace:
+        process functions:
+          "@ros_test_process_ros2__variant2": ros_test_process_ros2__variant2
       path: sites/all/themes/registryonsteroids/ros_theme
 
 -
