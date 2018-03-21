@@ -5,6 +5,8 @@
  * Main module file.
  */
 
+use Drupal\registryonsteroids\ThemeHookStubFactory;
+
 global $conf;
 
 // Auto-rebuild the theme registry.
@@ -132,6 +134,28 @@ function _registryonsteroids_first_theme_registry_alter(array &$registry) {
 function _registryonsteroids_first_theme_registry_do_alter(array &$registry, array $base_themes, $theme, array $user_functions, array $prefixes) {
   ksort($registry);
 
+  $stubs = _registryonsteroids_build_stubs(
+    $registry,
+    $user_functions,
+    $prefixes);
+
+  ksort($stubs);
+
+  $registry = array();
+  foreach ($stubs as $hook => $stub) {
+    $registry[$hook] = $stub->getRegistryEntry();
+  }
+}
+
+/**
+ * @param array $registry
+ * @param string[] $user_functions
+ * @param string[] $prefixes
+ *
+ * @return \Drupal\registryonsteroids\ThemeHookStub[]
+ */
+function _registryonsteroids_build_stubs(array $registry, array $user_functions, array $prefixes) {
+
   $functions_by_hook_and_phasekey_and_weight = _registryonsteroids_group_functions_by_hook_and_phasekey_and_weight($user_functions, $prefixes);
   $functions_by_hook_and_phasekey_and_weight += array('*' => array());
 
@@ -153,14 +177,6 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
   $discovered_hooks = array_keys($functions_by_hook_and_phasekey_and_weight);
   $discovered_hooks = array_combine($discovered_hooks, $discovered_hooks);
   $discovered_undeclared_hooks = array_diff_key($discovered_hooks, $declared_hooks);
-  $discovered_undeclared_variants = preg_grep('@__@', $discovered_undeclared_hooks);
-
-  $functions_r_by_hook_and_phasekey = array();
-  foreach ($functions_by_hook_and_phasekey_and_weight as $hook => $functions_by_phasekey_and_weight) {
-    foreach ($functions_by_phasekey_and_weight as $phase_key => $functions_by_weight) {
-      $functions_r_by_hook_and_phasekey[$hook][$phase_key] = array_combine($functions_by_weight, $functions_by_weight);
-    }
-  }
 
   $sortme = array();
   foreach (array($declared_hooks, $discovered_undeclared_hooks) as $hooks) {
@@ -174,168 +190,72 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
 
   ksort($sortme);
 
+  /** @var \Drupal\registryonsteroids\ThemeHookStub[] $trail */
   $trail = array();
+
+  /** @var \Drupal\registryonsteroids\ThemeHookStub[] $stubs */
+  $stubs = array();
+  /** @var \Drupal\registryonsteroids\ThemeHookStub|null $stub */
+  $stub = NULL;
   $base_hooks = $declared_base_hooks;
-  $cascades = array();
-  $parent = '*';
+
+  $factory = new ThemeHookStubFactory(
+    $registry,
+    $functions_by_hook_and_phasekey_and_weight);
+
   $base_hook = '*';
-  $cascade = array();
   foreach ($sortme as $key => $hook_or_false) {
-    // Invariants:
-    // - $cascade is the cascade of $parent
-    // - $base_hook is the base hook of $parent
-    //   (with $base_hook === $parent, if it is a "root" hook)
-    // - $cascades[$trail[$i]] is known for each $i in $trail.
-    // - $base_hooks[$trail[$i]] is known for each $i in $trail.
+
     if (FALSE === $hook_or_false) {
-      $parent = array_pop($trail);
-      $cascade = $cascades[$parent];
-      $base_hook = $base_hooks[$parent];
+      $stub = array_pop($trail);
       continue;
     }
 
-    $trail[] = $parent;
-    $parent = $hook_or_false;
-    if (isset($declared_root_hooks[$parent])) {
-      $cascade = array($parent);
-      $base_hook = $parent;
-    }
-    elseif (!isset($base_hooks[$parent]) || $base_hook === $base_hooks[$parent]) {
-      $cascade[] = $parent;
-      // $base_hook stays the same.
-    }
-    else {
-      $base_hook = $base_hooks[$parent];
-      $cascade = array($base_hook, $parent);
-    }
-    $cascades[$parent] = $cascade;
-    $base_hooks[$parent] = $base_hook;
-  }
-  unset($key, $hook_or_false, $parent, $base_hook, $cascade, $trail);
+    $trail[] = $stub;
+    $hook = $hook_or_false;
 
-  $registry_entries_to_add = array();
-  foreach ($discovered_undeclared_variants as $undeclared_variant) {
-    $base_hook = $undeclared_variant;
-    while (!isset($registry[$base_hook])) {
-      if (FALSE === $pos = strrpos($base_hook, '__')) {
-        break 2;
-      }
-      $base_hook = drupal_substr($base_hook, 0, $pos);
-      unset($pos);
-    }
-    $base_hook_info = $registry[$base_hook];
-    while (!empty($base_hook_info['base hook'])) {
-      $base_hook = $base_hook_info['base hook'];
-      if (!isset($registry[$base_hook])) {
-        break 2;
-      }
-      $base_hook_info = $registry[$base_hook];
-    }
-    $registry_entry = $base_hook_info;
-    $registry_entry['base hook'] = $base_hook;
-    $registry_entries_to_add[$undeclared_variant] = $registry_entry;
-  }
-  unset($undeclared_variant, $base_hook, $base_hook_info, $registry_entry);
-
-  $registry += $registry_entries_to_add;
-
-  $functionss_accum_by_basehook_and_phasekey_and_weight = array();
-  foreach ($functions_by_hook_and_phasekey_and_weight['*'] as $phase_key => $functions_by_weight) {
-    foreach ($declared_root_hooks as $hook) {
-      if (!empty($registry[$hook]['template'])) {
-        foreach ($functions_by_weight as $weight => $function) {
-          $functionss_accum_by_basehook_and_phasekey_and_weight[$hook][$phase_key][$weight][] = $function;
-        }
-        unset($weight, $function);
-      }
-    }
-    unset($phase_key, $hook);
-  }
-  unset($phase_key, $functions_by_weight);
-
-  foreach ($functions_by_hook_and_phasekey_and_weight as $hook => $functions_by_phasekey_and_weight) {
-    if ('*' === $hook) {
+    if (isset($stubs[$hook])) {
+      $stub = $stubs[$hook];
       continue;
     }
 
-    $base_hook = $base_hooks[$hook];
-    $cascade = $cascades[$hook];
-    array_pop($cascade);
-    foreach ($functions_by_phasekey_and_weight as $phase_key => $functions_by_weight) {
-      foreach ($functions_by_weight as $weight => $function) {
-        $functionss_accum_by_basehook_and_phasekey_and_weight[$base_hook][$phase_key][$weight][] = $function;
-      }
-      unset($weight, $function);
+    if (isset($declared_root_hooks[$hook])) {
+      // $hook has no parents.
+      $stub = $factory->createStub($hook);
     }
-    unset($base_hook, $cascade, $functions_by_weight, $phase_key);
-  }
-  unset($hook, $functions_by_phasekey_and_weight);
-
-  foreach (_registryonsteroids_theme_processors_phases() as $phase_key => $phase) {
-    $phase_template_root_functions_r = isset($functions_r_by_hook_and_phasekey['*'][$phase_key])
-      ? $functions_r_by_hook_and_phasekey['*'][$phase_key]
-      : array();
-    $trail = array();
-    $parent = '*';
-    $base_hook = '*';
-    $removables_r_by_hook = array();
-    $removables_r = array();
-
-    foreach ($sortme as $key => $hook_or_false) {
-      if (FALSE === $hook_or_false) {
-        $parent = array_pop($trail);
-        $removables_r = $removables_r_by_hook[$parent];
+    elseif (!isset($base_hooks[$hook]) || $base_hook === $base_hooks[$hook]) {
+      // $hook has the existing $stub as a parent, if that exists.
+      if (NULL === $stub) {
+        // This is a discovered hook that is not an ancestor of a declared hook.
         continue;
       }
-
-      $trail[] = $parent;
-      $parent = $hook_or_false;
-
-      if (isset($declared_root_hooks[$parent])) {
-        $removables_r = array();
-        if (isset($functionss_accum_by_basehook_and_phasekey_and_weight[$parent][$phase_key])) {
-          $removables_r = array_merge(...$functionss_accum_by_basehook_and_phasekey_and_weight[$parent][$phase_key]);
-          $removables_r = array_combine($removables_r, $removables_r);
-          if (isset($registry[$parent]['template'])) {
-            if (array() !== $phase_template_root_functions_r) {
-              $removables_r = array_diff($removables_r, $phase_template_root_functions_r);
-            }
-          }
-        }
+      $stub = $factory->createStub($hook, $stub);
+    }
+    else {
+      // $hook has one base hook but no other parents.
+      $base_hook = $base_hooks[$hook];
+      if (isset($stubs[$base_hook])) {
+        // Base hook was already calculated.
+        $stub = $factory->createStub($hook, $stubs[$base_hook]);
       }
-      elseif (!isset($base_hooks[$parent]) || $base_hook === $base_hooks[$parent]) {
-        // $removables_r stays the same.
-        // $base_hook stays the same.
+      elseif (isset($declared_root_hooks[$base_hook])) {
+        // Base hook is a known root hook, we just haven't visited it yet.
+        $base_stub = $factory->createStub($base_hook);
+        $stub = $factory->createStub($hook, $base_stub);
       }
       else {
-        $base_hook = $base_hooks[$parent];
-        $removables_r = $removables_r_by_hook[$base_hook];
+        // This is an invalid entry in theme registry.
+        // Treat this as if it didn't have a base hook.
+        $stub = $factory->createStub($hook);
       }
-
-      if (isset($functions_r_by_hook_and_phasekey[$parent][$phase_key])) {
-        $removables_r = array_diff_key(
-          $removables_r,
-          $functions_r_by_hook_and_phasekey[$parent][$phase_key]);
-      }
-
-      $removables_r_by_hook[$parent] = $removables_r;
-      $registry[$parent]['registryonsteroids unset'][$phase_key] = $removables_r;
-    }
-    unset($key, $hook_or_false, $parent, $base_hook, $trail, $removables_r);
-  }
-
-  foreach ($functionss_accum_by_basehook_and_phasekey_and_weight as $hook => $functionss_by_phasekey_and_weight) {
-    if ('*' === $hook) {
-      continue;
     }
 
-    foreach ($functionss_by_phasekey_and_weight as $phase_key => $functionss_by_weight) {
-      ksort($functionss_by_weight);
-      $registry[$hook][$phase_key] = array_merge(...$functionss_by_weight);
+    if (NULL !== $stub) {
+      $stubs[$hook] = $stub;
     }
   }
 
-  ksort($registry);
+  return $stubs;
 }
 
 /**
@@ -366,21 +286,31 @@ function _registryonsteroids_last_theme_registry_alter(array &$registry) {
   }
 
   foreach ($registry as &$info) {
-    if (!isset($info['registryonsteroids unset'])) {
+    if (!isset($info['registryonsteroids replace'])) {
       continue;
     }
 
-    foreach ($info['registryonsteroids unset'] as $phase_key => $functions_to_remove) {
+    foreach ($info['registryonsteroids replace'] as $phase_key => $replacements) {
       if (empty($info[$phase_key])) {
         continue;
       }
-      $info[$phase_key] = array_values(
-        array_diff(
-          $info[$phase_key],
-          $functions_to_remove));
+      foreach ($info[$phase_key] as $i => $function) {
+        if (isset($replacements[$function])) {
+          $info[$phase_key][$i] = $replacements[$function];
+        }
+      }
     }
 
-    unset($info['registryonsteroids unset']);
+    unset($info['registryonsteroids replace']);
+  }
+
+  foreach (_registryonsteroids_theme_processors_phases() as $phase_key => $phase) {
+    foreach ($registry as &$info) {
+      if (!isset($info[$phase_key])) {
+        continue;
+      }
+      $info[$phase_key] = preg_grep('/^@/', $info[$phase_key], PREG_GREP_INVERT);
+    }
   }
 
   unset($registry['*']);
