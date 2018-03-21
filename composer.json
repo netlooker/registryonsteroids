@@ -18,6 +18,9 @@
     "issues": "https://github.com/drupol/registryonsteroids/issues",
     "source": "https://github.com/drupol/registryonsteroids"
   },
+  "require": {
+    "drupal/xautoload": "*"
+  },
   "require-dev": {
     "phpro/grumphp": "^0.12",
     "phpunit/phpunit": "^5",
