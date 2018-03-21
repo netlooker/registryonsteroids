@@ -172,7 +172,6 @@ function _registryonsteroids_build_stubs(array $registry, array $user_functions,
       $declared_root_hooks[$hook] = $hook;
     }
   }
-  unset($hook, $info);
 
   $discovered_hooks = array_keys($functions_by_hook_and_phasekey_and_weight);
   $discovered_hooks = array_combine($discovered_hooks, $discovered_hooks);
@@ -184,9 +183,7 @@ function _registryonsteroids_build_stubs(array $registry, array $user_functions,
       $sortme[$hook . '__'] = $hook;
       $sortme[$hook . '__|'] = FALSE;
     }
-    unset($hook);
   }
-  unset($hooks);
 
   ksort($sortme);
 
