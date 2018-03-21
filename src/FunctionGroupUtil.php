@@ -4,6 +4,8 @@ namespace Drupal\registryonsteroids;
 
 /**
  * Utility class to find and group _process_ and _preprocess_ functions.
+ *
+ * @codingStandardsIgnoreFile
  */
 class FunctionGroupUtil {
 
@@ -11,7 +13,6 @@ class FunctionGroupUtil {
     'preprocess functions' => 'preprocess',
     'process functions' => 'process',
   );
-
 
   /**
    * Group functions by hook, phase and weight.

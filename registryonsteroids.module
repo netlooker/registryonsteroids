@@ -149,6 +149,8 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
 }
 
 /**
+ * Build the theme registry stubs.
+ *
  * @param array $registry
  * @param string[] $user_functions
  * @param string[] $prefixes
@@ -156,7 +158,6 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
  * @return \Drupal\registryonsteroids\ThemeHookStub[]
  */
 function _registryonsteroids_build_stubs(array $registry, array $user_functions, array $prefixes) {
-
   $functions_by_hook_and_phasekey_and_weight = FunctionGroupUtil::groupFunctionsByHookAndPhasekeyAndWeight($user_functions, $prefixes);
   $functions_by_hook_and_phasekey_and_weight += array('*' => array());
 
@@ -202,8 +203,7 @@ function _registryonsteroids_build_stubs(array $registry, array $user_functions,
     $functions_by_hook_and_phasekey_and_weight);
 
   $base_hook = '*';
-  foreach ($sortme as $key => $hook_or_false) {
-
+  foreach ($sortme as $hook_or_false) {
     if (FALSE === $hook_or_false) {
       $stub = array_pop($trail);
       continue;

@@ -4,6 +4,8 @@ namespace Drupal\registryonsteroids;
 
 /**
  * Contains data to build a modified theme registry entry.
+ *
+ * @codingStandardsIgnoreFile
  */
 class ThemeHookStub {
 
@@ -129,7 +131,6 @@ class ThemeHookStub {
    *   Format: $[$phase_key][] = $function_or_placeholder
    */
   private function getPlaceholdersByPhasekeySorted() {
-
     $placeholders_by_phasekey = array();
     foreach ($this->placeholderssByPhasekeyAndWeight as $phase_key => $placeholderss_by_weight) {
       ksort($placeholderss_by_weight);

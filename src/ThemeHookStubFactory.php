@@ -4,6 +4,8 @@ namespace Drupal\registryonsteroids;
 
 /**
  * Creates ThemeHookStub objects.
+ *
+ * @codingStandardsIgnoreFile
  */
 class ThemeHookStubFactory {
 
@@ -41,7 +43,6 @@ class ThemeHookStubFactory {
    * @return \Drupal\registryonsteroids\ThemeHookStub|null
    */
   public function createStub($hook, ThemeHookStub $parent = NULL) {
-
     $info = isset($this->registry[$hook])
       ? $this->registry[$hook]
       : NULL;
