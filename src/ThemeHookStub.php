@@ -43,10 +43,7 @@ class ThemeHookStub {
    * @var string[][]
    *   Format: $[$phase_key]['@' . $function] = $function
    */
-  private $replacementssByPhasekey = array(
-    'process functions' => array(),
-    'preprocess functions' => array(),
-  );
+  private $replacementssByPhasekey = array();
 
   /**
    * @param string $hook
@@ -121,7 +118,9 @@ class ThemeHookStub {
       $info[$phase_key] = $placeholders_sorted;
     }
 
-    $info['registryonsteroids replace'] = $this->replacementssByPhasekey;
+    if (array() !== $this->replacementssByPhasekey) {
+      $info['registryonsteroids replace'] = $this->replacementssByPhasekey;
+    }
 
     return $info;
   }
