@@ -132,8 +132,8 @@ function _registryonsteroids_first_theme_registry_alter(array &$registry) {
 function _registryonsteroids_first_theme_registry_do_alter(array &$registry, array $base_themes, $theme, array $user_functions, array $prefixes) {
   ksort($registry);
 
-  $functions_by_hook_and_phase_and_weight = _registryonsteroids_group_functions_by_hook_and_phase_and_weight($user_functions, $prefixes);
-  $functions_by_hook_and_phase_and_weight += array('*' => array());
+  $functions_by_hook_and_phasekey_and_weight = _registryonsteroids_group_functions_by_hook_and_phasekey_and_weight($user_functions, $prefixes);
+  $functions_by_hook_and_phasekey_and_weight += array('*' => array());
 
   $declared_hooks = array_keys($registry);
   $declared_hooks = array_combine($declared_hooks, $declared_hooks);
@@ -150,15 +150,15 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
   }
   unset($hook, $info);
 
-  $discovered_hooks = array_keys($functions_by_hook_and_phase_and_weight);
+  $discovered_hooks = array_keys($functions_by_hook_and_phasekey_and_weight);
   $discovered_hooks = array_combine($discovered_hooks, $discovered_hooks);
   $discovered_undeclared_hooks = array_diff_key($discovered_hooks, $declared_hooks);
   $discovered_undeclared_variants = preg_grep('@__@', $discovered_undeclared_hooks);
 
-  $functions_r_by_hook_and_phase = array();
-  foreach ($functions_by_hook_and_phase_and_weight as $hook => $functions_by_phase_and_weight) {
-    foreach ($functions_by_phase_and_weight as $phase => $functions_by_weight) {
-      $functions_r_by_hook_and_phase[$hook][$phase] = array_combine($functions_by_weight, $functions_by_weight);
+  $functions_r_by_hook_and_phasekey = array();
+  foreach ($functions_by_hook_and_phasekey_and_weight as $hook => $functions_by_phasekey_and_weight) {
+    foreach ($functions_by_phasekey_and_weight as $phase_key => $functions_by_weight) {
+      $functions_r_by_hook_and_phasekey[$hook][$phase_key] = array_combine($functions_by_weight, $functions_by_weight);
     }
   }
 
@@ -240,8 +240,7 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
   $registry += $registry_entries_to_add;
 
   $functionss_accum_by_basehook_and_phasekey_and_weight = array();
-  foreach ($functions_by_hook_and_phase_and_weight['*'] as $phase => $functions_by_weight) {
-    $phase_key = $phase . ' functions';
+  foreach ($functions_by_hook_and_phasekey_and_weight['*'] as $phase_key => $functions_by_weight) {
     foreach ($declared_root_hooks as $hook) {
       if (!empty($registry[$hook]['template'])) {
         foreach ($functions_by_weight as $weight => $function) {
@@ -252,9 +251,9 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
     }
     unset($phase_key, $hook);
   }
-  unset($phase, $functions_by_weight);
+  unset($phase_key, $functions_by_weight);
 
-  foreach ($functions_by_hook_and_phase_and_weight as $hook => $functions_by_phase_and_weight) {
+  foreach ($functions_by_hook_and_phasekey_and_weight as $hook => $functions_by_phasekey_and_weight) {
     if ('*' === $hook) {
       continue;
     }
@@ -262,8 +261,7 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
     $base_hook = $base_hooks[$hook];
     $cascade = $cascades[$hook];
     array_pop($cascade);
-    foreach ($functions_by_phase_and_weight as $phase => $functions_by_weight) {
-      $phase_key = $phase . ' functions';
+    foreach ($functions_by_phasekey_and_weight as $phase_key => $functions_by_weight) {
       foreach ($functions_by_weight as $weight => $function) {
         $functionss_accum_by_basehook_and_phasekey_and_weight[$base_hook][$phase_key][$weight][] = $function;
       }
@@ -271,11 +269,11 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
     }
     unset($base_hook, $cascade, $functions_by_weight, $phase_key);
   }
-  unset($hook, $functions_by_phase_and_weight);
+  unset($hook, $functions_by_phasekey_and_weight);
 
   foreach (_registryonsteroids_theme_processors_phases() as $phase_key => $phase) {
-    $phase_template_root_functions_r = isset($functions_r_by_hook_and_phase['*'][$phase])
-      ? $functions_r_by_hook_and_phase['*'][$phase]
+    $phase_template_root_functions_r = isset($functions_r_by_hook_and_phasekey['*'][$phase_key])
+      ? $functions_r_by_hook_and_phasekey['*'][$phase_key]
       : array();
     $trail = array();
     $parent = '*';
@@ -314,10 +312,10 @@ function _registryonsteroids_first_theme_registry_do_alter(array &$registry, arr
         $removables_r = $removables_r_by_hook[$base_hook];
       }
 
-      if (isset($functions_r_by_hook_and_phase[$parent][$phase])) {
+      if (isset($functions_r_by_hook_and_phasekey[$parent][$phase_key])) {
         $removables_r = array_diff_key(
           $removables_r,
-          $functions_r_by_hook_and_phase[$parent][$phase]);
+          $functions_r_by_hook_and_phasekey[$parent][$phase_key]);
       }
 
       $removables_r_by_hook[$parent] = $removables_r;
@@ -447,62 +445,62 @@ function _registryonsteroids_theme_make_prefixes(array $base_themes, $theme) {
  *   A whitelist of prefixes (module names, themes, etc).
  *
  * @return string[][][]
- *   Format: $[$hook][$phase][] = $function
+ *   Format: $[$hook][$phase_key][] = $function
  *   E.g. $['block']['preprocess'][] = 'system_preprocess_block'.
  */
-function _registryonsteroids_group_functions_by_hook_and_phase_with_inheritance(array $user_functions, array $prefixes) {
-  $functions_by_hook_and_phase_and_weight = _registryonsteroids_group_functions_by_hook_and_phase_and_weight($user_functions, $prefixes);
+function _registryonsteroids_group_functions_by_hook_and_phasekey_with_inheritance(array $user_functions, array $prefixes) {
+  $functions_by_hook_and_phasekey_and_weight = _registryonsteroids_group_functions_by_hook_and_phasekey_and_weight($user_functions, $prefixes);
 
-  $functions_by_hook_and_phase_and_weight_extended = $functions_by_hook_and_phase_and_weight;
-  foreach ($functions_by_hook_and_phase_and_weight as $hook => $functions_by_phase) {
-    $functions_by_hook_and_phase_and_weight_extended[$hook . '__'] = TRUE;
-    $functions_by_hook_and_phase_and_weight_extended[$hook . '__|'] = FALSE;
+  $functions_by_hook_and_phasekey_and_weight_extended = $functions_by_hook_and_phasekey_and_weight;
+  foreach ($functions_by_hook_and_phasekey_and_weight as $hook => $functions_by_phasekey) {
+    $functions_by_hook_and_phasekey_and_weight_extended[$hook . '__'] = TRUE;
+    $functions_by_hook_and_phasekey_and_weight_extended[$hook . '__|'] = FALSE;
   }
 
-  ksort($functions_by_hook_and_phase_and_weight_extended);
+  ksort($functions_by_hook_and_phasekey_and_weight_extended);
 
-  $keys = array_keys($functions_by_hook_and_phase_and_weight_extended);
+  $keys = array_keys($functions_by_hook_and_phasekey_and_weight_extended);
   $keymap = array_flip($keys);
   $skipmap = array();
   foreach ($keys as $i => $key) {
-    $entry = $functions_by_hook_and_phase_and_weight_extended[$key];
+    $entry = $functions_by_hook_and_phasekey_and_weight_extended[$key];
     if (TRUE === $entry || FALSE === $entry) {
       $skipmap[$i] = TRUE;
     }
   }
 
-  $functionss_by_hook_and_phase_and_weight_with_inheritance = array();
+  $functionss_by_hook_and_phasekey_and_weight_with_inheritance = array();
   foreach ($keys as $i => $key) {
-    if (TRUE !== $functions_by_hook_and_phase_and_weight_extended[$key]) {
+    if (TRUE !== $functions_by_hook_and_phasekey_and_weight_extended[$key]) {
       continue;
     }
     $end_key = $key . '|';
     $i_end = $keymap[$end_key];
     $parent_hook = $keys[$i - 1];
-    $parent_hook_functions_by_phase_and_weight = $functions_by_hook_and_phase_and_weight_extended[$parent_hook];
+    $parent_hook_functions_by_phasekey_and_weight = $functions_by_hook_and_phasekey_and_weight_extended[$parent_hook];
 
     for ($j = $i - 1; $j < $i_end; ++$j) {
       if (isset($skipmap[$j])) {
         continue;
       }
       $hook_j = $keys[$j];
-      foreach ($parent_hook_functions_by_phase_and_weight as $phase => $functions_by_weight) {
+      foreach ($parent_hook_functions_by_phasekey_and_weight as $phase_key => $functions_by_weight) {
         foreach ($functions_by_weight as $weight => $function) {
-          $functionss_by_hook_and_phase_and_weight_with_inheritance[$hook_j][$phase][$weight][] = $function;
+          $functionss_by_hook_and_phasekey_and_weight_with_inheritance[$hook_j][$phase_key][$weight][] = $function;
         }
       }
     }
   }
 
-  $functionss_by_hook_and_phase_with_inheritance = array();
-  foreach ($functionss_by_hook_and_phase_and_weight_with_inheritance as $hook => $functionss_by_phase_and_weight) {
-    foreach ($functionss_by_phase_and_weight as $phase => $functionss_by_weight) {
+  $functionss_by_hook_and_phasekey_with_inheritance = array();
+  foreach ($functionss_by_hook_and_phasekey_and_weight_with_inheritance as $hook => $functionss_by_phasekey_and_weight) {
+    foreach ($functionss_by_phasekey_and_weight as $phase_key => $functionss_by_weight) {
       ksort($functionss_by_weight);
-      $functionss_by_hook_and_phase_with_inheritance[$hook][$phase] = array_merge(...$functionss_by_weight);
+      $functionss_by_hook_and_phasekey_with_inheritance[$hook][$phase_key] = array_merge(...$functionss_by_weight);
     }
   }
 
-  return $functionss_by_hook_and_phase_with_inheritance;
+  return $functionss_by_hook_and_phasekey_with_inheritance;
 }
 
 /**
@@ -513,28 +511,28 @@ function _registryonsteroids_group_functions_by_hook_and_phase_with_inheritance(
  *   A whitelist of prefixes (module names, themes, etc).
  *
  * @return string[][][]
- *   Format: $[$hook][$phase][$weight] = $function
+ *   Format: $[$hook][$phase_key][$weight] = $function
  *   E.g. $['block']['preprocess'][51] = 'system_preprocess_block'.
  */
-function _registryonsteroids_group_functions_by_hook_and_phase_and_weight(array $user_functions, array $prefixes) {
-  $functions_by_prefix_and_phase_filtered = _registryonsteroids_group_functions_by_prefix_and_phase_filtered(
+function _registryonsteroids_group_functions_by_hook_and_phasekey_and_weight(array $user_functions, array $prefixes) {
+  $functions_by_prefix_and_phasekey_filtered = _registryonsteroids_group_functions_by_prefix_and_phasekey_filtered(
     $user_functions,
     $prefixes);
 
-  $functions_by_hook_and_phase_and_weight = array();
+  $functions_by_hook_and_phasekey_and_weight = array();
   $weight = 0;
-  foreach ($functions_by_prefix_and_phase_filtered as $functions_by_phase) {
-    foreach ($functions_by_phase as $phase => $functions_by_hook) {
+  foreach ($functions_by_prefix_and_phasekey_filtered as $functions_by_phasekey) {
+    foreach ($functions_by_phasekey as $phase_key => $functions_by_hook) {
       foreach ($functions_by_hook as $hook => $function) {
-        $functions_by_hook_and_phase_and_weight[$hook][$phase][$weight] = $function;
+        $functions_by_hook_and_phasekey_and_weight[$hook][$phase_key][$weight] = $function;
       }
     }
     ++$weight;
   }
 
-  ksort($functions_by_hook_and_phase_and_weight);
+  ksort($functions_by_hook_and_phasekey_and_weight);
 
-  return $functions_by_hook_and_phase_and_weight;
+  return $functions_by_hook_and_phasekey_and_weight;
 }
 
 /**
@@ -545,23 +543,23 @@ function _registryonsteroids_group_functions_by_hook_and_phase_and_weight(array 
  *   A whitelist of prefixes (module names, themes, etc).
  *
  * @return string[][][]
- *   Format: $[$prefix][$phase][$themehook] = $function
+ *   Format: $[$prefix][$phase_key][$themehook] = $function
  *   E.g. $['system']['preprocess']['block'] = 'system_preprocess_block'.
  */
-function _registryonsteroids_group_functions_by_prefix_and_phase_filtered(array $user_functions, array $prefixes) {
-  $functions_by_prefix_and_phase = _registryonsteroids_group_functions_by_prefix_and_phase(
+function _registryonsteroids_group_functions_by_prefix_and_phasekey_filtered(array $user_functions, array $prefixes) {
+  $functions_by_prefix_and_phasekey = _registryonsteroids_group_functions_by_prefix_and_phasekey(
     $user_functions);
 
   // Only keep functions with known prefix.
-  $functions_by_prefix_and_phase_filtered = array();
+  $functions_by_prefix_and_phasekey_filtered = array();
   foreach ($prefixes as $prefix) {
-    if (!isset($functions_by_prefix_and_phase[$prefix])) {
+    if (!isset($functions_by_prefix_and_phasekey[$prefix])) {
       continue;
     }
-    $functions_by_prefix_and_phase_filtered[$prefix] = $functions_by_prefix_and_phase[$prefix];
+    $functions_by_prefix_and_phasekey_filtered[$prefix] = $functions_by_prefix_and_phasekey[$prefix];
   }
 
-  return $functions_by_prefix_and_phase_filtered;
+  return $functions_by_prefix_and_phasekey_filtered;
 }
 
 /**
@@ -570,14 +568,14 @@ function _registryonsteroids_group_functions_by_prefix_and_phase_filtered(array 
  * @param string[] $user_functions
  *
  * @return string[][][]
- *   Format: $[$prefix][$phase][$themehook] = $function
+ *   Format: $[$prefix][$phase_key][$themehook] = $function
  *   E.g. $['system']['preprocess']['block'] = 'system_preprocess_block'.
  */
-function _registryonsteroids_group_functions_by_prefix_and_phase(array $user_functions) {
+function _registryonsteroids_group_functions_by_prefix_and_phasekey(array $user_functions) {
   $candidate_functions = preg_grep('/process/', $user_functions);
 
-  $functions_by_prefix_and_phase = [];
-  foreach (array('preprocess', 'process') as $phase) {
+  $functions_by_prefix_and_phasekey = [];
+  foreach (_registryonsteroids_theme_processors_phases() as $phase_key => $phase) {
     $needle = '_' . $phase . '_';
 
     $phase_functions = preg_grep('/_' . $phase . '_/', $candidate_functions);
@@ -591,7 +589,7 @@ function _registryonsteroids_group_functions_by_prefix_and_phase(array $user_fun
       if (!isset($fragments[2])) {
         // This is the normal case with only one occurence of $needle.
         list($prefix, $hook) = $fragments;
-        $functions_by_prefix_and_phase[$prefix][$phase][$hook] = $function;
+        $functions_by_prefix_and_phasekey[$prefix][$phase_key][$hook] = $function;
         continue;
       }
 
@@ -600,7 +598,7 @@ function _registryonsteroids_group_functions_by_prefix_and_phase(array $user_fun
       $prefix = array_shift($fragments);
       while (array() !== $fragments) {
         $hook = implode($needle, $fragments);
-        $functions_by_prefix_and_phase[$prefix][$phase][$hook] = $function;
+        $functions_by_prefix_and_phasekey[$prefix][$phase_key][$hook] = $function;
         $prefix .= $needle . array_shift($fragments);
       }
     }
@@ -609,9 +607,9 @@ function _registryonsteroids_group_functions_by_prefix_and_phase(array $user_fun
     $substr_length = -drupal_strlen($phase) - 1;
     foreach ($phase_functions as $function) {
       $prefix = drupal_substr($function, 0, $substr_length);
-      $functions_by_prefix_and_phase[$prefix][$phase]['*'] = $function;
+      $functions_by_prefix_and_phasekey[$prefix][$phase_key]['*'] = $function;
     }
   }
 
-  return $functions_by_prefix_and_phase;
+  return $functions_by_prefix_and_phasekey;
 }
