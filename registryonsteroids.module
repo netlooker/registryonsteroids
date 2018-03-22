@@ -191,6 +191,11 @@ function _registryonsteroids_build_stubs(array $registry, array $user_functions,
 }
 
 /**
+ * Builds theme registry stubs from prepared parameters.
+ *
+ * This was split out of the parent function to reduce function sizes, and
+ * "because we can".
+ *
  * @param \Drupal\registryonsteroids\ThemeHookStubFactory $factory
  * @param string[] $hooks
  *   Format: $[$hook] = $hook
