@@ -39,6 +39,7 @@ class RegistryDefinitionsTest extends AbstractThemeTest {
    */
   public function testIntermediateEntry($hook, array $expected_intermediate_entry) {
     $intermediate_registry = variable_get('ros_test_intermediate_theme_registry');
+
     if (NULL === $intermediate_registry) {
       $this->fail('Intermediate theme registry was not written');
     }
