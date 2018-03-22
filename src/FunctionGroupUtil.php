@@ -9,6 +9,12 @@ namespace Drupal\registryonsteroids;
  */
 class FunctionGroupUtil {
 
+  /**
+   * Phases for process/preprocess functions.
+   *
+   * @var string[]
+   *   Format: $[$phase_key] = $phase
+   */
   const PHASES = array(
     'preprocess functions' => 'preprocess',
     'process functions' => 'process',
