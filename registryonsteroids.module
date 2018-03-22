@@ -8,18 +8,22 @@
 use Drupal\registryonsteroids\FunctionGroupUtil;
 use Drupal\registryonsteroids\ThemeHookStubFactory;
 
-global $conf;
+/**
+ * Implements hook_init().
+ */
+function registryonsteroids_init() {
+  // Auto-rebuild the theme registry.
+  if (variable_get('registryonsteroids_rebuild_registry', FALSE) && !defined('MAINTENANCE_MODE')) {
+    // Make sure this file is loaded.
+    include_once 'modules/system/system.module';
+    // Rebuild .info data.
+    system_rebuild_theme_data();
+    // Rebuild theme registry.
+    drupal_theme_rebuild();
+  }
 
-// Auto-rebuild the theme registry.
-if (variable_get('registryonsteroids_rebuild_registry', FALSE) && !defined('MAINTENANCE_MODE')) {
-  include_once 'modules/system/system.module';
-  // Rebuild .info data.
-  system_rebuild_theme_data();
-  // Rebuild theme registry.
-  drupal_theme_rebuild();
+  $GLOBALS['conf']['theme_debug'] = variable_get('registryonsteroids_theme_debug', FALSE);
 }
-
-$conf['theme_debug'] = variable_get('registryonsteroids_theme_debug', FALSE);
 
 /**
  * Implements hook_menu().
