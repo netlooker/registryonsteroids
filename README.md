@@ -2,11 +2,55 @@
 
 # Registry On Steroïds
 
-Registry On Steroïds(ROS) fixes a limitation in Drupal 7 core, where some preprocess/process hooks are not properly registered in the theme registry.
+Registry On Steroïds(ROS) discovers and adds additional theme preprocess/process functions for theme hook variants, if `theme()` is called with a variant name. E.g. for `theme('node__article__teaser', ..)`, it will call functions like `MYTHEME_preprocess_node__article__teaser()` and `MYTHEME_preprocess_node__article()` in addition to `MYTHEME_preprocess_node()`.
 
-This module fixes this by detecting and registering all preprocess/process callbacks in the right order then rewriting the Drupal's theme registry.
+Without this module, only the process/preprocess functions of the base hook will be called, when a theme hook variant is executed. E.g. for `theme('node__article__teaser')`, only the preprocess and process functions for `'node'` are called. See [#2563445](https://www.drupal.org/node/2563445) in the issue queue for Drupal 7.
 
-By updating it, it provides an improved inheritance mechanism with the preprocess/process callbacks cascade.
+The module only has en effect if the theme hook is called with a variant hook name. It does not work for theme hook suggestions added to the `$variables` array.
+
+## Background: Theme hook variants
+
+A "theme hook variant" is a specialized version of a base theme hook, with a suffix like "__$x", that is executed instead of the base hook in specific cases.
+
+Based on such theme hook variants, it might execute a specific template `node--article--teaser.tpl.php`, if such a template exists in the active theme or in a module. Otherwise it will fall back to the parent or base template, e.g. `node--article.tpl.php` or `node.tpl.php`. Or, for theme functions, it might execute `THEMENAME_menu_tree__main_menu()` instead of the base function `THEMENAME_menu_tree()` or `theme_menu_tree()`.
+
+Drupal 7 has 4 ways of invoking theme hook variants:
+1. The `theme()` function can be called with an array of theme hooks, instead of a single theme hook, e.g. `theme(array('node__article__teaser', 'node__article', 'node'), ..)`.
+2. The `theme()` function can be called with a hook name containing double underscores, e.g. `theme('node__article__teaser')`. Drupal will try different substrings of the specified hook, until it finds an existing registered theme hook variant.
+3. The `theme()` function can be called with theme hook suggestions in the `$variables` array, e.g. `theme('node', $variables)` with `$variables['theme_hook_suggestions'] === array('node__article__teaser', 'node__article')`.
+4. After the `theme()` function is called, possibly with just the base hook `'node'`, preprocses functions can register an array of theme hook names or theme hook variant names in `$variables['theme_hook_suggestions']`. Later, these suggestions will be used to determine which template should be rendered, or which theme function should be executed.
+
+The last is currently the most common way to invoke theme hook variants in Drupal 7.
+
+In the theme registry, a theme hook variant is an entry with an `$info['base hook']` setting, pointing to another theme hook. E.g. the entry for `'node__article__teaser'`, if it exists, would have `$registry['node__article__teaser']['base hook'] === 'node'`.
+
+The base theme hooks themselves, e.g. `'node'`, do not have a `'base hook'` setting.
+
+
+## Background: (Pre)process functions
+
+Before calling the theme function or including the template, `theme()` will excute a series of preprocess and process functions registered for this theme hook. The functions are discovered based on their function name in a clearly defined order, but this array can be modified by modules with `hook_theme_registry_alter()`.
+
+E.g. for `theme('node', ..)`, all existing functions like `template_preprocess_node()`, `MYMODULE_preprocess_node()` or `MYTHEME_preprocess_node()` will be executed.
+
+Some modules use `hook_theme_registry_alter()` to register additional functions for specific theme hooks, e.g. [Display Suite](https://drupal.org/project/ds) registers a function `ds_entity_variables()` as a preprocessor for all entity theme hooks.
+
+When calling a theme hook variant like `theme('node__article__teaser', ..)`, only the base hook preprocess functions like `MYTHEME_preprocess_node()` are executed. Variant preprocess functions like `MYTHEME_preprocess_node__article__teaser()` are not discovered and not called.
+
+The variant preprocess functions used to work (more or less) in Drupal 6, so this could be seen as a regression in Drupal 7.
+
+## This module
+
+This module modifies the theme registry in the following way:
+- Entries for base hooks are not changed.
+- Existing entries for variants, e.g. if a template like `node--article--teaser.tpl.php` was discovered, are modified so that variant-specific preprocess and process functions are called in addition to those of the base hook. Functions that were added by contrib modules, like `ds_entity_variables` added by Display Suite, are preserved, as if the module had added the function on the variant itself.
+- New variant entries are created for discovered preprocess/process functions where an entry does not exist yet. E.g. if a preprocess function `MYTHEME_preprocess_node__webform__full` is found, then a new entry for `$registry['node__webform__full']` will be created, even if no template like `node--webform--full.tpl.php` exists.
+
+
+## Submodule "registryonsteroids_alter"
+
+The submodule modifies render arrays, so that `$element['#theme']` refers to a hook variant instead of a base hook. Without this, the base module would have little effect.
+
 
 # Details
 
