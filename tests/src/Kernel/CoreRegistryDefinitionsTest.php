@@ -15,7 +15,6 @@ class CoreRegistryDefinitionsTest extends AbstractThemeTest {
   protected function setUp() {
     parent::setUp();
     module_disable(array('registryonsteroids'));
-    drupal_flush_all_caches();
   }
 
   /**
