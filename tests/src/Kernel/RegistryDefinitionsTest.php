@@ -30,7 +30,7 @@ class RegistryDefinitionsTest extends AbstractThemeTest {
   }
 
   /**
-   * The the registry after the first part.
+   * Test the registry after the first part.
    *
    * @param string $hook
    * @param array $expected_intermediate_entry
