@@ -21,6 +21,19 @@ class FunctionGroupUtil {
   );
 
   /**
+   * Array keys of the above.
+   *
+   * These are also the keys used in theme registry entries.
+   *
+   * @var string[]
+   *   Format: $[] = $phase_key
+   */
+  const PHASE_KEYS = array(
+    'preprocess functions',
+    'process functions',
+  );
+
+  /**
    * Group functions by hook, phase and weight.
    *
    * @param string[] $user_functions

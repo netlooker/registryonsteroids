@@ -273,7 +273,7 @@ function _registryonsteroids_last_theme_registry_alter(array &$registry) {
         continue;
       }
       $base_hook_info = $registry[$base_hook];
-      foreach (['preprocess functions', 'process functions'] as $phase_key) {
+      foreach (FunctionGroupUtil::PHASE_KEYS as $phase_key) {
         $info[$phase_key] = isset($base_hook_info[$phase_key])
           ? $base_hook_info[$phase_key]
           : [];
@@ -302,11 +302,12 @@ function _registryonsteroids_last_theme_registry_alter(array &$registry) {
     unset($info['registryonsteroids replace']);
   }
 
-  foreach (FunctionGroupUtil::PHASES as $phase_key => $phase) {
+  foreach (FunctionGroupUtil::PHASE_KEYS as $phase_key) {
     foreach ($registry as &$info) {
       if (!isset($info[$phase_key])) {
         continue;
       }
+
       $info[$phase_key] = preg_grep('/^@/', $info[$phase_key], PREG_GREP_INVERT);
     }
   }
