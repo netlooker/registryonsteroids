@@ -70,7 +70,7 @@ class ThemeHookStubFactory {
       return NULL;
     }
 
-    return ThemeHookStub::createRoot(
+    return new ThemeHookStub(
       $hook,
       $info,
       $functions_by_phasekey_and_weight,

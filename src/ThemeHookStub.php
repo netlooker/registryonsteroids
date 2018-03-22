@@ -45,7 +45,7 @@ class ThemeHookStub {
   private $replacementssByPhasekey = array();
 
   /**
-   * Create a root theme hook stub.
+   * Constructs a stub without parents ("root").
    *
    * @param string $hook
    * @param array $info
@@ -54,36 +54,26 @@ class ThemeHookStub {
    * @param string[][] $templateFunctionsByPhasekeyAndWeight
    *   Format: $[$phase_key][$weight] = $function
    *   Should be empty if this is not a template.
-   *
-   * @return self
    */
-  public static function createRoot($hook, array $info, array $functionsByPhasekeyAndWeight, array $templateFunctionsByPhasekeyAndWeight) {
-    $root = new self();
-    $root->baseHook = $hook;
-    $root->baseHookStub = $root;
+  public function __construct($hook, array $info, array $functionsByPhasekeyAndWeight, array $templateFunctionsByPhasekeyAndWeight) {
+    $this->baseHook = $hook;
+    $this->baseHookStub = $this;
     // Remove original process/preprocess functions.
     // They will be replaced later.
     unset($info['process functions'], $info['preprocess functions']);
-    $root->info = $info;
+    $this->info = $info;
     foreach ($templateFunctionsByPhasekeyAndWeight as $phase_key => $functionsByWeight) {
       foreach ($functionsByWeight as $weight => $function) {
-        $root->placeholderssByPhasekeyAndWeight[$phase_key][$weight][] = $function;
+        $this->placeholderssByPhasekeyAndWeight[$phase_key][$weight][] = $function;
       }
     }
 
     foreach ($functionsByPhasekeyAndWeight as $phase_key => $functionsByWeight) {
       foreach ($functionsByWeight as $weight => $function) {
-        $root->placeholderssByPhasekeyAndWeight[$phase_key][$weight][] = $function;
+        $this->placeholderssByPhasekeyAndWeight[$phase_key][$weight][] = $function;
       }
     }
-
-    return $root;
   }
-
-  /**
-   * Private (incomplete) constructor.
-   */
-  private function __construct() {}
 
   /**
    * Add variant to a specific hook.
