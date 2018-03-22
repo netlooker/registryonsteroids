@@ -197,7 +197,6 @@ function ros_test_process_ros1__variant1(&$variables, $hook) {
  * Implements hook_process_hook().
  */
 function ros_test_process_ros2(&$variables, $hook) {
-  $variables['theme_hook_suggestions'][] = 'coin';
   $variables['callbacks'][] = __FUNCTION__;
 }
 
