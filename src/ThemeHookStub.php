@@ -80,11 +80,13 @@ class ThemeHookStub {
         $root->placeholderssByPhasekeyAndWeight[$phase_key][$weight][] = $function;
       }
     }
+
     foreach ($functionsByPhasekeyAndWeight as $phase_key => $functionsByWeight) {
       foreach ($functionsByWeight as $weight => $function) {
         $root->placeholderssByPhasekeyAndWeight[$phase_key][$weight][] = $function;
       }
     }
+
     return $root;
   }
 
@@ -105,12 +107,14 @@ class ThemeHookStub {
   public function addVariant($hook, array $info = NULL, array $functionsByPhasekeyAndWeight) {
     $variant = clone $this;
     $variant->cascade[] = $hook;
+
     foreach ($functionsByPhasekeyAndWeight as $phase_key => $functionsByWeight) {
       foreach ($functionsByWeight as $weight => $function) {
         $this->baseHookStub->placeholderssByPhasekeyAndWeight[$phase_key][$weight][] = '@' . $function;
         $variant->replacementssByPhasekey[$phase_key]['@' . $function] = $function;
       }
     }
+
     if (NULL !== $info) {
       // Remove original process/preprocess functions.
       // They will be replaced later.
@@ -118,8 +122,10 @@ class ThemeHookStub {
       unset($info['preprocess functions']);
       $variant->info = $info;
     }
+
     $variant->info['base hook'] = $this->baseHook;
     $variant->placeholderssByPhasekeyAndWeight = array();
+
     return $variant;
   }
 
@@ -130,6 +136,7 @@ class ThemeHookStub {
    */
   public function getRegistryEntry() {
     $info = $this->info;
+
     foreach ($this->getPlaceholdersByPhasekeySorted() as $phase_key => $placeholders_sorted) {
       $info[$phase_key] = $placeholders_sorted;
     }
@@ -149,6 +156,7 @@ class ThemeHookStub {
    */
   private function getPlaceholdersByPhasekeySorted() {
     $placeholders_by_phasekey = array();
+
     foreach ($this->placeholderssByPhasekeyAndWeight as $phase_key => $placeholderss_by_weight) {
       ksort($placeholderss_by_weight);
       $placeholders_by_phasekey[$phase_key] = array() !== $placeholderss_by_weight
