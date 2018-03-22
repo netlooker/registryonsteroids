@@ -178,14 +178,34 @@ function _registryonsteroids_build_stubs(array $registry, array $user_functions,
 
   $discovered_hooks = array_keys($functions_by_hook_and_phasekey_and_weight);
   $discovered_hooks = array_combine($discovered_hooks, $discovered_hooks);
-  $discovered_undeclared_hooks = array_diff_key($discovered_hooks, $declared_hooks);
 
-  $sortme = array();
-  foreach (array($declared_hooks, $discovered_undeclared_hooks) as $hooks) {
-    foreach ($hooks as $hook) {
-      $sortme[$hook . '__'] = $hook;
-      $sortme[$hook . '__|'] = FALSE;
-    }
+  $factory = new ThemeHookStubFactory(
+    $registry,
+    $functions_by_hook_and_phasekey_and_weight);
+
+  return _registryonsteroids_do_build_stubs(
+    $factory,
+    $declared_hooks + $discovered_hooks,
+    $declared_base_hooks,
+    $declared_root_hooks);
+}
+
+/**
+ * @param \Drupal\registryonsteroids\ThemeHookStubFactory $factory
+ * @param string[] $hooks
+ *   Format: $[$hook] = $hook
+ * @param string[] $base_hooks
+ *   Format: $[hook] = $base_hook
+ * @param string[] $declared_root_hooks
+ *   Format: $[$hook] = $hook
+ *
+ * @return \Drupal\registryonsteroids\ThemeHookStub[]
+ */
+function _registryonsteroids_do_build_stubs(ThemeHookStubFactory $factory, array $hooks, array $base_hooks, array $declared_root_hooks) {
+  $sortme = [];
+  foreach ($hooks as $hook) {
+    $sortme[$hook . '__'] = $hook;
+    $sortme[$hook . '__|'] = FALSE;
   }
 
   ksort($sortme);
@@ -197,11 +217,6 @@ function _registryonsteroids_build_stubs(array $registry, array $user_functions,
   $stubs = array();
   /** @var \Drupal\registryonsteroids\ThemeHookStub|null $stub */
   $stub = NULL;
-  $base_hooks = $declared_base_hooks;
-
-  $factory = new ThemeHookStubFactory(
-    $registry,
-    $functions_by_hook_and_phasekey_and_weight);
 
   $base_hook = '*';
   foreach ($sortme as $hook_or_false) {
