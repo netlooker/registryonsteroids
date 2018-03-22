@@ -4,29 +4,35 @@ namespace Drupal\registryonsteroids;
 
 /**
  * Creates ThemeHookStub objects.
- *
- * @codingStandardsIgnoreFile
  */
 class ThemeHookStubFactory {
 
   /**
+   * The theme registry.
+   *
    * @var array[]
    */
   private $registry;
 
   /**
+   * Functions indexed by hook name, phase and then weight.
+   *
    * @var string[][][]
    *   Format: $[$hook][$phase_key][$weight] = $function
    */
   private $functionsByHookAndPhasekeyAndWeight;
 
   /**
+   * Template functions indexed by phase and then weight.
+   *
    * @var string[][]
    *   Format: $[$phase_key][$weight] = $function
    */
   private $templateFunctionsByPhasekeyAndWeight;
 
   /**
+   * ThemeHookStubFactory constructor.
+   *
    * @param array[] $registry
    * @param string[][][] $functions_by_hook_and_phasekey_and_weight
    */
@@ -37,6 +43,8 @@ class ThemeHookStubFactory {
   }
 
   /**
+   * Create a theme hook stub.
+   *
    * @param string $hook
    * @param \Drupal\registryonsteroids\ThemeHookStub|null $parent
    *

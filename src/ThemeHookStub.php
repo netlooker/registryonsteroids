@@ -4,45 +4,57 @@ namespace Drupal\registryonsteroids;
 
 /**
  * Contains data to build a modified theme registry entry.
- *
- * @codingStandardsIgnoreFile
  */
 class ThemeHookStub {
 
   /**
+   * The base hook.
+   *
    * @var string
    */
   private $baseHook;
 
   /**
+   * The base hook stub.
+   *
    * @var self
    */
   private $baseHookStub;
 
   /**
+   * A cascade of hook.
+   *
    * @var string[]
    *   Format: [$base_hook, .., $hook]
    */
   private $cascade;
 
   /**
+   * The info related to a theme hook.
+   *
    * @var array
    */
   private $info;
 
   /**
+   * Placeholders indexed by phase and weight.
+   *
    * @var string[][]
    *   Format: $[$phase_key][$weight][] = $placeholder_or_function
    */
   private $placeholderssByPhasekeyAndWeight = array();
 
   /**
+   * Replacements indexed by phase.
+   *
    * @var string[][]
    *   Format: $[$phase_key]['@' . $function] = $function
    */
   private $replacementssByPhasekey = array();
 
   /**
+   * Create a root theme hook stub.
+   *
    * @param string $hook
    * @param array $info
    * @param string[][] $functionsByPhasekeyAndWeight
@@ -82,6 +94,8 @@ class ThemeHookStub {
   private function __construct() {}
 
   /**
+   * Add variant to a specific hook.
+   *
    * @param string $hook
    * @param array|null $info
    * @param array $functionsByPhasekeyAndWeight
@@ -110,6 +124,8 @@ class ThemeHookStub {
   }
 
   /**
+   * Get a registry entry.
+   *
    * @return array
    */
   public function getRegistryEntry() {
@@ -126,6 +142,8 @@ class ThemeHookStub {
   }
 
   /**
+   * Placeholders indexed by phase and sorted.
+   *
    * @return string[][][]
    *   Format: $[$phase_key][] = $function_or_placeholder
    */
