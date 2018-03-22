@@ -72,8 +72,7 @@ class ThemeHookStub {
     $root->baseHookStub = $root;
     // Remove original process/preprocess functions.
     // They will be replaced later.
-    unset($info['process functions']);
-    unset($info['preprocess functions']);
+    unset($info['process functions'], $info['preprocess functions']);
     $root->info = $info;
     foreach ($templateFunctionsByPhasekeyAndWeight as $phase_key => $functionsByWeight) {
       foreach ($functionsByWeight as $weight => $function) {
@@ -118,8 +117,7 @@ class ThemeHookStub {
     if (NULL !== $info) {
       // Remove original process/preprocess functions.
       // They will be replaced later.
-      unset($info['process functions']);
-      unset($info['preprocess functions']);
+      unset($info['process functions'], $info['preprocess functions']);
       $variant->info = $info;
     }
 
