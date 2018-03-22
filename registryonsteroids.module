@@ -333,6 +333,13 @@ function _registryonsteroids_last_theme_registry_alter(array &$registry) {
  *   Format: $[$prefix_type][$prefix] = $prefix
  */
 function _registryonsteroids_theme_make_prefixes(array $base_themes, $theme) {
+  /** @var string[] $base_theme_names */
+  $base_theme_names = array_map(
+    function ($theme) {
+      return $theme->name;
+    },
+    $base_themes);
+
   return array(
     'template' => array(
       'template' => 'template',
@@ -342,8 +349,8 @@ function _registryonsteroids_theme_make_prefixes(array $base_themes, $theme) {
       $theme->engine => $theme->engine,
     ),
     'base_theme' => array_combine(
-      array_keys($base_themes),
-      array_keys($base_themes)
+      $base_theme_names,
+      $base_theme_names
     ),
     'theme' => array(
       $theme->name => $theme->name,
