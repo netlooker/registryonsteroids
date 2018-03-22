@@ -22,14 +22,6 @@ class ThemeHookStub {
   private $baseHookStub;
 
   /**
-   * A cascade of hook.
-   *
-   * @var string[]
-   *   Format: [$base_hook, .., $hook]
-   */
-  private $cascade;
-
-  /**
    * The info related to a theme hook.
    *
    * @var array
@@ -68,7 +60,6 @@ class ThemeHookStub {
   public static function createRoot($hook, array $info, array $functionsByPhasekeyAndWeight, array $templateFunctionsByPhasekeyAndWeight) {
     $root = new self();
     $root->baseHook = $hook;
-    $root->cascade = array($hook);
     $root->baseHookStub = $root;
     // Remove original process/preprocess functions.
     // They will be replaced later.
@@ -105,7 +96,6 @@ class ThemeHookStub {
    */
   public function addVariant($hook, array $info = NULL, array $functionsByPhasekeyAndWeight) {
     $variant = clone $this;
-    $variant->cascade[] = $hook;
 
     foreach ($functionsByPhasekeyAndWeight as $phase_key => $functionsByWeight) {
       foreach ($functionsByWeight as $weight => $function) {
