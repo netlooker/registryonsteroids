@@ -40,6 +40,9 @@ function registryonsteroids_alter_entity_view_alter(array &$build, $type) {
  * Implements hook_form_alter().
  */
 function registryonsteroids_alter_form_alter(array &$form, array &$form_state, $form_id) {
+  // Extend the #theme property of the form, at top level.
+  _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions($form, array($form_id));
+
   // Custom recursive function to alter all the #theme and #theme_wrappers keys
   // of form elements.
   _registryonsteroids_alter_form_element_theme_alter($form, $form_state, $form_id);
