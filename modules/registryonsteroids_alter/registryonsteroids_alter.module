@@ -7,3 +7,31 @@
 
 require_once __DIR__ . '/registryonsteroids_alter.helpers.inc';
 require_once __DIR__ . '/registryonsteroids_alter.alter.inc';
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * We make sure our alter hooks are the latest to run so they can alter
+ * properly render arrays. (E.g. page alter hook and system_page_alter)
+ *
+ * @param mixed[] $implementations
+ *   Format: $[$module] = $group
+ * @param string $hook
+ */
+function registryonsteroids_alter_module_implements_alter(array &$implementations, $hook) {
+  // List of hooks that we are implementing in this module.
+  $hooks = array(
+    'element_info_alter',
+    'entity_view_alter',
+    'form_alter',
+    'page_alter',
+    'field_attach_view_alter',
+  );
+
+  // Make sure this module run the last.
+  if (in_array($hook, $hooks) && isset($implementations['registryonsteroids_alter'])) {
+    $group = $implementations['registryonsteroids_alter'];
+    unset($implementations['registryonsteroids_alter']);
+    $implementations['registryonsteroids_alter'] = $group;
+  }
+}
