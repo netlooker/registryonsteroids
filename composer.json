@@ -9,6 +9,11 @@
   "prefer-stable": true,
   "authors": [
     {
+      "name": "Andreas Hennings",
+      "homepage": "https://www.drupal.org/u/donquixote",
+      "role": "Author"
+    },
+    {
       "name": "Pol Dellaiera",
       "homepage": "https://www.drupal.org/u/pol",
       "role": "Author"
