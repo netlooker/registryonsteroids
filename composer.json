@@ -1,9 +1,10 @@
 {
   "name": "drupol/registryonsteroids",
-  "description": "TODO",
+  "description": "Enhance the Drupal 7 theming layer by adding more preprocess/process functions.",
   "type": "drupal-module",
   "license": "GPL-2.0",
   "homepage": "https://github.com/drupol/registryonsteroids",
+  "keywords": ["drupal", "drupal7", "theming", "theme registry"],
   "minimum-stability": "dev",
   "prefer-stable": true,
   "authors": [
