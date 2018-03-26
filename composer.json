@@ -1,12 +1,18 @@
 {
   "name": "drupol/registryonsteroids",
-  "description": "TODO",
+  "description": "Enhance the Drupal 7 theming layer by adding more preprocess/process functions.",
   "type": "drupal-module",
   "license": "GPL-2.0",
   "homepage": "https://github.com/drupol/registryonsteroids",
+  "keywords": ["drupal", "drupal7", "theming", "theme registry"],
   "minimum-stability": "dev",
   "prefer-stable": true,
   "authors": [
+    {
+      "name": "Andreas Hennings",
+      "homepage": "https://www.drupal.org/u/donquixote",
+      "role": "Author"
+    },
     {
       "name": "Pol Dellaiera",
       "homepage": "https://www.drupal.org/u/pol",
@@ -21,8 +27,6 @@
   "require-dev": {
     "phpro/grumphp": "^0.12",
     "phpunit/phpunit": "^5",
-    "anahkiasen/underscore-php" : "dev-master",
-    "peridot-php/leo": "~1.0",
     "ec-europa/qa-automation": "3.0.1",
     "composer/installers": "^1.2",
     "cweagans/composer-patches": "^1.6",
@@ -32,8 +36,8 @@
     "drush/drush": "^8",
     "drupal/drupal-extension": "~3.4",
     "drupal/devel": "*",
-    "openeuropa/task-runner": "^0.4",
-    "drupal/xautoload": "*"
+    "drupal/xautoload": "*",
+    "openeuropa/task-runner": "^0.4"
   },
   "autoload": {
     "psr-4": {
