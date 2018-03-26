@@ -49,7 +49,7 @@ This module modifies the theme registry in the following way:
 
 ## Submodule "registryonsteroids_alter"
 
-The submodule modifies render arrays in multiple Drupal places so that `$element['#theme']` refers to a hook variant instead of a base hook.
+Currently hidden and in development, this submodule modifies render arrays in multiple Drupal places so that `$element['#theme']` refers to a hook variant instead of a base hook.
 Without this, the base module would have little effect.
 
 E.g. When calling `theme('node', [...]);` to render a page node, this module will alter the render array and in the end,
@@ -66,6 +66,8 @@ And it will also provides multiple templates suggestions:
 * `node--page--full.tpl.php`
 * `node--page.tpl.php`
 * `node.tpl.php`
+
+The name "_registryonsteroids_alter_" might be subject to change in the next release.
 
 # Installation
 
