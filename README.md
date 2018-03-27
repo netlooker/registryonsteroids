@@ -61,7 +61,7 @@ This will allow themers and designers to use particular preprocess/process callb
 * `[HOOK]_preprocess_node__page(&$variables, $hook);`
 * `[HOOK]_preprocess_node__page__full(&$variables, $hook);`
 
-And it will also provides multiple templates suggestions:
+And thanks to these specific alterations, Drupal will automatically provides specific templates suggestions like:
 
 * `node--page--full.tpl.php`
 * `node--page.tpl.php`
