@@ -52,20 +52,14 @@ This module modifies the theme registry in the following way:
 Currently hidden and in development, this submodule modifies render arrays in multiple Drupal places so that `$element['#theme']` refers to a hook variant instead of a base hook.
 Without this, the base module would have little effect.
 
-E.g. When calling `theme('node', [...]);` to render a page node, this module will alter the render array and in the end,
-`theme('node__page__full', [...]);` will be used instead to render the page.
+Thanks to specific hooks, we alter the render arrays to dynamically replace e.g. `'#theme' => 'node'` by `'#theme' => 'node__article__teaser'` based on the value that we found in the render array.
 
-This will allow themers and designers to use particular preprocess/process callbacks like the following in this order:
+But core and some contrib modules already set `$variables['theme_hook_suggestions']` during preprocess. See
+- [template_preprocess_node()](https://api.drupal.org/api/drupal/modules%21node%21node.module/function/template_preprocess_node/7.x)
+- [template_preprocess_entity()](http://www.drupalcontrib.org/api/drupal/contributions%21entity%21theme%21entity.theme.inc/function/template_preprocess_entity/7)
+- [ds_entity_variables()](http://www.drupalcontrib.org/api/drupal/contributions%21ds%21ds.module/function/ds_entity_variables/7)
 
-* `[HOOK]_preprocess_node(&$variables, $hook);`
-* `[HOOK]_preprocess_node__page(&$variables, $hook);`
-* `[HOOK]_preprocess_node__page__full(&$variables, $hook);`
-
-And thanks to these specific alterations, Drupal will automatically provides specific templates suggestions like:
-
-* `node--page--full.tpl.php`
-* `node--page.tpl.php`
-* `node.tpl.php`
+So without "_registryonsteroids_alter_" we would still get some or all of the template suggestions, depending which other modules are installed.
 
 The name "_registryonsteroids_alter_" might be subject to change in the next release.
 
