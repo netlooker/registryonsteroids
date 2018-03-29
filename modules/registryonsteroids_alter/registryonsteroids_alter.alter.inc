@@ -8,37 +8,40 @@
 /**
  * Implements hook_element_info_alter().
  */
-function registryonsteroids_alter_element_info_alter(&$types) {
-  foreach ($types as &$type) {
-    if (isset($type['#theme_wrappers'])) {
-      foreach ((array) $type['#theme_wrappers'] as $key => $theme_wrapper) {
-        if ($type['#type'] !== $theme_wrapper) {
-          // Using current to make sure to have the first item of the array
-          // Instead of the complete array.
-          $type['#theme_wrappers'][$key] = current(
-            _registryonsteroids_alter_extend_with_suggestions(
-              array($theme_wrapper),
-              array($type['#type'])
-            )
-          );
-        }
-      }
-    }
+function registryonsteroids_alter_element_info_alter(array &$elements) {
+  foreach ($elements as &$element) {
+    _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions($element, (array) $element['#type']);
   }
 }
 
 /**
  * Implements hook_entity_view_alter().
  */
-function registryonsteroids_alter_entity_view_alter(&$build, $type) {
-  $build['#theme'] = _registryonsteroids_alter_extend_theme_hook($build['#theme'], array($build['#bundle'], $build['#view_mode']));
+function registryonsteroids_alter_entity_view_alter(array &$build, $type) {
+  $suggestions_parts = array(
+    isset($build['#entity_type']) ? $build['#entity_type'] : NULL,
+    isset($build['#bundle']) ? $build['#bundle'] : NULL,
+    isset($build['#view_mode']) ? $build['#view_mode'] : NULL,
+  );
+
+  if ($entity = registryonsteroids_alter_menu_get_any_object()) {
+    foreach (array('id', 'revision') as $key) {
+      if (isset($entity['entity']->{$entity['entity info']['entity keys'][$key]})) {
+        $suggestions_parts[] = $entity['entity']->{$entity['entity info']['entity keys'][$key]};
+      }
+    }
+  }
+
+  _registryonsteroids_alter_extend_theme_property_with_suggestions($build, $suggestions_parts);
+  _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions($build, $suggestions_parts);
 }
 
 /**
  * Implements hook_form_alter().
  */
-function registryonsteroids_alter_form_alter(&$form, &$form_state, $form_id) {
-  // Custom recursive function to alter all the #theme keys of form elements.
+function registryonsteroids_alter_form_alter(array &$form, array &$form_state, $form_id) {
+  // Custom recursive function to alter all the #theme and #theme_wrappers keys
+  // of form elements.
   _registryonsteroids_alter_form_element_theme_alter($form, $form_state, $form_id);
 
   /*
@@ -47,17 +50,21 @@ function registryonsteroids_alter_form_alter(&$form, &$form_state, $form_id) {
    *
    * Remove if #1245218 is backported to D7 core.
    */
-  foreach (array_keys($form) as $item) {
-    if (strpos($item, 'field_') === 0) {
-      if (!empty($form[$item]['#attributes']['class'])) {
-        foreach ($form[$item]['#attributes']['class'] as &$class) {
-          // Core bug: the field-type-text-with-summary class
-          // is used as a JS hook.
-          if (($class !== 'field-type-text-with-summary') && (0 === strpos($class, 'field-type-')|| strpos($class, 'field-name-') === 0)) {
-            // Make the class different from that used in theme_field().
-            $class = 'form-' . $class;
-          }
-        }
+  foreach (element_children($form) as $element_key) {
+    if (FALSE !== strpos($element_key, 'field_')) {
+      continue;
+    }
+
+    if (empty($form[$element_key]['#attributes']['class'])) {
+      continue;
+    }
+
+    foreach ((array) $form[$element_key]['#attributes']['class'] as &$class) {
+      // Core bug: the field-type-text-with-summary class
+      // is used as a JS hook.
+      if (('field-type-text-with-summary' !== $class) && (0 === strpos($class, 'field-type-') || 0 === strpos($class, 'field-name-'))) {
+        // Make the class different from that used in theme_field().
+        $class = 'form-' . $class;
       }
     }
   }
@@ -66,63 +73,96 @@ function registryonsteroids_alter_form_alter(&$form, &$form_state, $form_id) {
 /**
  * Custom callback.
  *
- * This function will alter all the element in a form and update their
- * #theme key to append the $form_id at the end so we can preprocess them.
+ * This function will update all form elements in a form and extend their
+ * #theme and #theme_wrappers properties.
  *
  * @see form_builder()
  */
-function _registryonsteroids_alter_form_element_theme_alter(&$form, &$form_state, $form_id) {
-  foreach (element_children($form) as $key) {
-    if (isset($form[$key]['#type']) && empty($form[$key]['#defaults_loaded']) && ($info = element_info($form[$key]['#type']))) {
-      if (isset($info['#theme'])) {
-        $form[$key]['#theme'] = _registryonsteroids_alter_extend_with_suggestions(
-          (array) $info['#theme'],
-          array('form', $form_id, $key)
+function _registryonsteroids_alter_form_element_theme_alter(array &$form, array &$form_state, $form_id) {
+  foreach (element_children($form) as $element_key) {
+    if (isset($form[$element_key]['#type']) && empty($form[$element_key]['#defaults_loaded'])) {
+      if ($info = element_info($form[$element_key]['#type'])) {
+        $suggestions_parts = array(
+          'form',
+          $form_id,
+          $element_key,
         );
-      }
 
-      if (isset($info['#theme_wrappers'])) {
-        $form[$key] += array('#theme_wrappers' => array());
-        $form[$key]['#theme_wrappers'] = _registryonsteroids_alter_extend_with_suggestions(
-          $info['#theme_wrappers'],
-          array('form', $form_id, $key)
-        );
+        if (isset($info['#theme'])) {
+          $form[$element_key] += array('#theme' => $info['#theme']);
+          _registryonsteroids_alter_extend_theme_property_with_suggestions(
+            $form[$element_key],
+            $suggestions_parts
+          );
+        }
+
+        if (isset($info['#theme_wrappers'])) {
+          $form[$element_key] += array('#theme_wrappers' => $info['#theme_wrappers']);
+          _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions(
+            $form[$element_key],
+            $suggestions_parts
+          );
+        }
       }
     }
 
-    _registryonsteroids_alter_form_element_theme_alter($form[$key], $form_state, $form_id);
+    _registryonsteroids_alter_form_element_theme_alter($form[$element_key], $form_state, $form_id);
   }
 }
 
 /**
  * Implements hook_page_alter().
  */
-function registryonsteroids_alter_page_alter(&$page) {
-  foreach (system_region_list($GLOBALS['theme'], REGIONS_VISIBLE) as $region => $name) {
-    if (empty($page[$region])) {
-      continue;
+function registryonsteroids_alter_page_alter(array &$page) {
+  $suggestions_parts = array();
+
+  // Alter the page #theme if an entity is found.
+  if ($entity = registryonsteroids_alter_menu_get_any_object()) {
+    $suggestions_parts[] = $entity['entity type'];
+
+    foreach (array('bundle', 'id', 'revision') as $key) {
+      if (isset($entity['entity']->{$entity['entity info']['entity keys'][$key]})) {
+        $suggestions_parts[] = $entity['entity']->{$entity['entity info']['entity keys'][$key]};
+      }
     }
 
-    if (isset($page[$region]['#theme_wrappers'])) {
-      $page[$region]['#theme_wrappers'] = _registryonsteroids_alter_extend_with_suggestions($page[$region]['#theme_wrappers'], array($region));
-    }
+    _registryonsteroids_alter_extend_theme_property_with_suggestions($page, $suggestions_parts);
+    _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions($page, $suggestions_parts);
+  }
 
-    $block_index_in_region = 0;
-    $blocks = element_children($page[$region]);
-    $total_blocks_in_region = count($blocks);
+  foreach (element_children($page) as $region_name) {
+    // Alter the page region theme wrapper.
+    _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions($page[$region_name], array_merge((array) $region_name, $suggestions_parts));
 
-    // Alter each blocks to provides relevant variables in the block preprocess.
-    foreach ($blocks as $block) {
-      _registryonsteroids_alter_update_block_render_array($page[$region][$block], $region, $block_index_in_region++, $total_blocks_in_region);
-    }
+    registryonsteroids_recursive_foreach($page[$region_name], function ($key, &$value, &$parent) use ($suggestions_parts) {
+      if ('#block' !== $key) {
+        return;
+      }
+
+      $block_suggestion_parts = array(
+        $value->region,
+        $value->module,
+        $value->delta,
+      );
+
+      _registryonsteroids_alter_extend_theme_property_with_suggestions($parent, array_merge($block_suggestion_parts, $suggestions_parts));
+
+      if (isset($parent['#theme'])) {
+        $block_suggestion_parts = array_merge((array) $parent['#theme'], $block_suggestion_parts);
+      }
+
+      _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions($parent, array_merge($block_suggestion_parts, $suggestions_parts));
+    });
   }
 }
 
 /**
  * Implements hook_field_attach_view_alter().
  */
-function registryonsteroids_field_attach_view_alter(&$output, $context) {
-  $suggestion_data = array(
+function registryonsteroids_field_attach_view_alter(array &$output, array $context = array()) {
+  // Array members of the field render array to use
+  // to build the field #theme value.
+  $suggestions_parts_names = array(
     'field_type',
     'formatter',
     'field_name',
@@ -132,15 +172,10 @@ function registryonsteroids_field_attach_view_alter(&$output, $context) {
   );
 
   foreach (element_children($output) as $key) {
-    $suggestions = array_filter(array_map(function ($suggestion) use ($output, $key) {
-      return isset($output[$key]['#' . $suggestion]) ? $output[$key]['#' . $suggestion] : NULL;
-    }, $suggestion_data));
+    $suggestions_parts_values = array_map(function ($suggestion) use ($output, $key) {
+        return isset($output[$key]['#' . $suggestion]) ? $output[$key]['#' . $suggestion] : NULL;
+    }, $suggestions_parts_names);
 
-    if (isset($output[$key]['#theme']) && !empty($suggestions)) {
-      $output[$key]['#theme'] = _registryonsteroids_alter_extend_with_suggestions(
-        (array) $output[$key]['#theme'],
-        $suggestions
-      );
-    }
+    _registryonsteroids_alter_extend_theme_property_with_suggestions($output[$key], $suggestions_parts_values);
   }
 }
