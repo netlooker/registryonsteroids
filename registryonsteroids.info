@@ -4,3 +4,9 @@ core = 7.x
 configure = admin/config/development/registryonsteroids
 
 dependencies[] = xautoload
+
+; If the contrib module "alternatives" is available, the user is able to choose between xautoload or registry_autoload.
+alternatives[xautoload][] = registry_autoload
+
+; Configuration for registry_autoload if it's used.
+registry_autoload[] = PSR-4
