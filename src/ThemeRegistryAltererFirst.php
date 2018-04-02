@@ -142,7 +142,6 @@ final class ThemeRegistryAltererFirst implements ThemeRegistryAltererInterface {
 
     /** @var \Drupal\registryonsteroids\ThemeHookStub[] $trail */
     $trail = array();
-
     /** @var \Drupal\registryonsteroids\ThemeHookStub[] $stubs */
     $stubs = array();
     /** @var \Drupal\registryonsteroids\ThemeHookStub|null $stub */
