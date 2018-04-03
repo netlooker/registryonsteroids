@@ -11,9 +11,7 @@
  * @return array
  *   The configuration form.
  */
-function _registryonsteroids_admin_settings() {
-  $form = array();
-
+function _registryonsteroids_admin_settings(array $form, array $form_state) {
   $form['registryonsteroids_theme_debug'] = array(
     '#type'          => 'checkbox',
     '#title'         => t('Enable theme debug ?'),
