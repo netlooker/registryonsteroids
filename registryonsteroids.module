@@ -33,8 +33,8 @@ function registryonsteroids_init() {
 function registryonsteroids_menu() {
   return array(
     'admin/config/development/registryonsteroids' => array(
-      'title' => 'Registry On Steroids',
-      'description' => 'Registry On Steroids configuration',
+      'title' => 'Registry on steroids',
+      'description' => 'Registry on steroids configuration',
       'page callback' => 'drupal_get_form',
       'page arguments' => array('_registryonsteroids_admin_settings'),
       'access arguments' => array(
@@ -65,7 +65,8 @@ function registryonsteroids_module_implements_alter(array &$implementations, $ho
 /**
  * Callback for hook_theme_registry_alter().
  *
- * Registered to run before all other implemntations.
+ * This hook is registered through hook_module_implements_alter and
+ * run before all other hook_theme_registry_alter implementations.
  *
  * @param array[] $registry
  *   Format: $[$theme_hook] = $info
@@ -102,7 +103,8 @@ function _registryonsteroids_first_theme_registry_alter(array &$registry) {
 /**
  * Callback for hook_theme_registry_alter()
  *
- * Registered to run after all other implementations.
+ * This hook is registered through hook_module_implements_alter and
+ * run after all other hook_theme_registry_alter implementations.
  *
  * @param array[] $registry
  *   Format: $[$theme_hook] = $info
