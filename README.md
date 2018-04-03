@@ -74,6 +74,7 @@ Without "_registryonsteroids_alter_", we would still get some or all of the temp
 # Dependencies
 
 - [xautoload](https://www.drupal.org/project/xautoload)
+- If the contrib module "[Alternatives](https://www.drupal.org/project/alternatives)" is available, the user is able to choose between [xautoload](https://www.drupal.org/project/xautoload) or [registry_autoload](https://www.drupal.org/project/registry_autoload).
 
 # More details
 
