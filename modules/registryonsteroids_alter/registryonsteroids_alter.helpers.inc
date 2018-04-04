@@ -83,7 +83,9 @@ function _registryonsteroids_alter_extend_theme_property_with_suggestions(array 
  */
 function _registryonsteroids_alter_extend_value_with_suggestions($base, array $suggestions_parts) {
   if (empty($base) || !is_string($base)) {
-    return FALSE;
+    // Make sure we do not modify the $base parameter be returning it if doesn't
+    // pass this test.
+    return $base;
   }
 
   array_unshift($suggestions_parts, $base);
