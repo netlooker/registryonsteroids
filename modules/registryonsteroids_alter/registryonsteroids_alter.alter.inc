@@ -135,25 +135,28 @@ function registryonsteroids_alter_page_alter(array &$page) {
     _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions($page[$region_name], array_merge((array) $region_name, $suggestions_parts));
 
     // Extend the blocks that are inside each region.
-    registryonsteroids_recursive_foreach($page[$region_name], function ($key, &$value, &$parent) use ($suggestions_parts) {
-      if ('#block' !== $key) {
-        return;
+    registryonsteroids_recursive_foreach(
+      $page[$region_name],
+      function ($key, &$value, &$parent) use ($suggestions_parts) {
+        if ('#block' !== $key) {
+          return;
+        }
+
+        $block_suggestion_parts = array(
+          $value->region,
+          $value->module,
+          $value->delta,
+        );
+
+        _registryonsteroids_alter_extend_theme_property_with_suggestions($parent, array_merge($block_suggestion_parts, $suggestions_parts));
+
+        if (isset($parent['#theme'])) {
+          $block_suggestion_parts = array_merge((array) $parent['#theme'], $block_suggestion_parts);
+        }
+
+        _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions($parent, array_merge($block_suggestion_parts, $suggestions_parts));
       }
-
-      $block_suggestion_parts = array(
-        $value->region,
-        $value->module,
-        $value->delta,
-      );
-
-      _registryonsteroids_alter_extend_theme_property_with_suggestions($parent, array_merge($block_suggestion_parts, $suggestions_parts));
-
-      if (isset($parent['#theme'])) {
-        $block_suggestion_parts = array_merge((array) $parent['#theme'], $block_suggestion_parts);
-      }
-
-      _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions($parent, array_merge($block_suggestion_parts, $suggestions_parts));
-    });
+    );
   }
 }
 
