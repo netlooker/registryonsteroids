@@ -24,14 +24,6 @@ function registryonsteroids_alter_entity_view_alter(array &$build, $type) {
     isset($build['#view_mode']) ? $build['#view_mode'] : NULL,
   );
 
-  if ($entity = registryonsteroids_alter_menu_get_any_object()) {
-    foreach (array('id', 'revision') as $key) {
-      if (isset($entity['entity']->{$entity['entity info']['entity keys'][$key]})) {
-        $suggestions_parts[] = $entity['entity']->{$entity['entity info']['entity keys'][$key]};
-      }
-    }
-  }
-
   _registryonsteroids_alter_extend_theme_property_with_suggestions($build, $suggestions_parts);
   _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions($build, $suggestions_parts);
 }
@@ -128,10 +120,8 @@ function registryonsteroids_alter_page_alter(array &$page) {
   if ($entity = registryonsteroids_alter_menu_get_any_object()) {
     $suggestions_parts[] = $entity['entity type'];
 
-    foreach (array('bundle', 'id', 'revision') as $key) {
-      if (isset($entity['entity']->{$entity['entity info']['entity keys'][$key]})) {
-        $suggestions_parts[] = $entity['entity']->{$entity['entity info']['entity keys'][$key]};
-      }
+    if (isset($entity['entity']->{$entity['entity info']['entity keys']['bundle']})) {
+      $suggestions_parts[] = $entity['entity']->{$entity['entity info']['entity keys']['bundle']};
     }
   }
 
@@ -171,19 +161,6 @@ function registryonsteroids_alter_page_alter(array &$page) {
  * Implements hook_field_attach_view_alter().
  */
 function registryonsteroids_field_attach_view_alter(array &$output, array $context = array()) {
-  $entity_suggestions_parts = array();
-
-  // Try to extract the entity ID and revision ID.
-  if (isset($context['entity_type'])) {
-    if ($entity = entity_get_info($context['entity_type'])) {
-      foreach (array('id', 'revision') as $key) {
-        if (isset($context['entity']->{$entity['entity keys'][$key]})) {
-          $entity_suggestions_parts[] = $context['entity']->{$entity['entity keys'][$key]};
-        }
-      }
-    }
-  }
-
   // Array properties of the render array field to use to extend the field
   // #theme property.
   $suggestions_parts_names = array(
@@ -202,7 +179,7 @@ function registryonsteroids_field_attach_view_alter(array &$output, array $conte
 
     _registryonsteroids_alter_extend_theme_property_with_suggestions(
       $output[$key],
-      array_merge($suggestions_parts_values, $entity_suggestions_parts)
+      $suggestions_parts_values
     );
   }
 }
