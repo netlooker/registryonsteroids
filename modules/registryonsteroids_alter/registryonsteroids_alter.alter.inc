@@ -7,6 +7,8 @@
 
 /**
  * Implements hook_element_info_alter().
+ *
+ * @param array $elements
  */
 function registryonsteroids_alter_element_info_alter(array &$elements) {
   foreach ($elements as &$element) {
@@ -16,6 +18,9 @@ function registryonsteroids_alter_element_info_alter(array &$elements) {
 
 /**
  * Implements hook_entity_view_alter().
+ *
+ * @param array $build
+ * @param string $type
  */
 function registryonsteroids_alter_entity_view_alter(array &$build, $type) {
   $suggestions_parts = array(
@@ -30,6 +35,10 @@ function registryonsteroids_alter_entity_view_alter(array &$build, $type) {
 
 /**
  * Implements hook_form_alter().
+ *
+ * @param array $form
+ * @param array $form_state
+ * @param string $form_id
  */
 function registryonsteroids_alter_form_alter(array &$form, array &$form_state, $form_id) {
   // Extend the #theme property of the form, at top level.
@@ -107,6 +116,8 @@ function _registryonsteroids_alter_form_element_theme_alter(array &$form, array 
 
 /**
  * Implements hook_page_alter().
+ *
+ * @param array $page
  */
 function registryonsteroids_alter_page_alter(array &$page) {
   $suggestions_parts = array();
@@ -176,6 +187,9 @@ function registryonsteroids_alter_page_alter(array &$page) {
 
 /**
  * Implements hook_field_attach_view_alter().
+ *
+ * @param array $output
+ * @param array $context
  */
 function registryonsteroids_field_attach_view_alter(array &$output, array $context = array()) {
   // Array properties of the render array field to use to extend the field
@@ -205,8 +219,11 @@ function registryonsteroids_field_attach_view_alter(array &$output, array $conte
 
 /**
  * Implements hook_contextual_links_view_alter().
+ *
+ * @param array $element
+ * @param array $items
  */
-function registryonsteroids_alter_contextual_links_view_alter(&$element, $items) {
+function registryonsteroids_alter_contextual_links_view_alter(array &$element, array $items) {
   $suggestions_parts = array();
 
   if (isset($element['#element']['#theme'])) {
