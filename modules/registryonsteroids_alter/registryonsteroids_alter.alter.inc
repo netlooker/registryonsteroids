@@ -203,3 +203,19 @@ function registryonsteroids_field_attach_view_alter(array &$output, array $conte
     );
   }
 }
+
+/**
+ * Implements hook_contextual_links_view_alter().
+ */
+function registryonsteroids_alter_contextual_links_view_alter(&$element, $items) {
+  $suggestions_parts = array();
+
+  if (isset($element['#element']['#theme'])) {
+    $suggestions_parts = (array) $element['#element']['#theme'];
+  }
+  if (isset($element['#element']['#theme_wrappers'])) {
+    $suggestions_parts = array_merge($suggestions_parts, $element['#element']['#theme_wrappers']);
+  }
+
+  _registryonsteroids_alter_extend_theme_property_with_suggestions($element, $suggestions_parts);
+}
