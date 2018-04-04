@@ -15,7 +15,6 @@ env:
     - PATH=$PATH:/home/travis/.composer/vendor/bin:$TRAVIS_BUILD_DIR/vendor/bin
 
 install:
-  - sudo apt-get install apache2
   - composer self-update
   - composer install
 
