@@ -10,7 +10,7 @@
  */
 function registryonsteroids_alter_element_info_alter(array &$elements) {
   foreach ($elements as &$element) {
-    _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions($element, (array) $element['#type']);
+    _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions($element, array($element['#type']));
   }
 }
 
