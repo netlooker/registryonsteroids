@@ -190,9 +190,11 @@ function registryonsteroids_field_attach_view_alter(array &$output, array $conte
   );
 
   foreach (element_children($output) as $key) {
-    $suggestions_parts_values = array_map(function ($suggestion) use ($output, $key) {
+    $suggestions_parts_values = array_map(
+      function ($suggestion) use ($output, $key) {
         return isset($output[$key]['#' . $suggestion]) ? $output[$key]['#' . $suggestion] : NULL;
-    }, $suggestions_parts_names);
+      },
+      $suggestions_parts_names);
 
     _registryonsteroids_alter_extend_theme_property_with_suggestions(
       $output[$key],

@@ -18,9 +18,13 @@ function _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestio
     return;
   }
 
-  $element['#theme_wrappers'] = array_map(function ($theme_hook) use ($suggestions_parts) {
-    return _registryonsteroids_alter_extend_value_with_suggestions($theme_hook, $suggestions_parts);
-  }, $element['#theme_wrappers']);
+  $element['#theme_wrappers'] = array_map(
+    function ($theme_hook) use ($suggestions_parts) {
+      return _registryonsteroids_alter_extend_value_with_suggestions(
+        $theme_hook,
+        $suggestions_parts);
+    },
+    $element['#theme_wrappers']);
 }
 
 /**
@@ -37,13 +41,20 @@ function _registryonsteroids_alter_extend_theme_property_with_suggestions(array 
   }
 
   if (is_string($element['#theme'])) {
-    $element['#theme'] = _registryonsteroids_alter_extend_value_with_suggestions($element['#theme'], $suggestions_parts);
+    $element['#theme'] = _registryonsteroids_alter_extend_value_with_suggestions(
+      $element['#theme'],
+      $suggestions_parts);
   }
 
   if (is_array($element['#theme'])) {
-    $element['#theme'] = array_map(function ($theme_hook) use ($suggestions_parts) {
-      return _registryonsteroids_alter_extend_value_with_suggestions($theme_hook, $suggestions_parts);
-    }, $element['#theme']);
+    $element['#theme'] = array_map(
+      function ($theme_hook) use ($suggestions_parts) {
+        return _registryonsteroids_alter_extend_value_with_suggestions(
+          $theme_hook,
+          $suggestions_parts);
+      },
+      $element['#theme']
+    );
   }
 }
 
