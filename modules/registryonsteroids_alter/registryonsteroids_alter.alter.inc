@@ -80,6 +80,10 @@ function registryonsteroids_alter_form_alter(array &$form, array &$form_state, $
  * This function will update all form elements in a form and extend their
  * #theme and #theme_wrappers properties.
  *
+ * @param array $form
+ * @param array $form_state
+ * @param string $form_id
+ *
  * @see form_builder()
  */
 function _registryonsteroids_alter_form_element_theme_alter(array &$form, array &$form_state, $form_id) {
