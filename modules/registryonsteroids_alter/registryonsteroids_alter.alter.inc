@@ -132,7 +132,11 @@ function registryonsteroids_alter_page_alter(array &$page) {
 
   foreach (element_children($page) as $region_name) {
     // Extend the #theme_wrappers property of each page region.
-    _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions($page[$region_name], array_merge((array) $region_name, $suggestions_parts));
+    _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions(
+      $page[$region_name],
+      array_merge(
+        (array) $region_name,
+        $suggestions_parts));
 
     // Extend the blocks that are inside each region.
     registryonsteroids_recursive_foreach(
@@ -148,13 +152,23 @@ function registryonsteroids_alter_page_alter(array &$page) {
           $value->delta,
         );
 
-        _registryonsteroids_alter_extend_theme_property_with_suggestions($parent, array_merge($block_suggestion_parts, $suggestions_parts));
+        _registryonsteroids_alter_extend_theme_property_with_suggestions(
+          $parent,
+          array_merge(
+            $block_suggestion_parts,
+            $suggestions_parts));
 
         if (isset($parent['#theme'])) {
-          $block_suggestion_parts = array_merge((array) $parent['#theme'], $block_suggestion_parts);
+          $block_suggestion_parts = array_merge(
+            (array) $parent['#theme'],
+            $block_suggestion_parts);
         }
 
-        _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions($parent, array_merge($block_suggestion_parts, $suggestions_parts));
+        _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions(
+          $parent,
+          array_merge(
+            $block_suggestion_parts,
+            $suggestions_parts));
       }
     );
   }

@@ -117,7 +117,9 @@ function _registryonsteroids_alter_update_block_render_array(array &$block_array
     $suggestions_parts = array_merge($suggestions_parts, (array) $block_array['#theme']);
   }
 
-  _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions($block_array, $suggestions_parts);
+  _registryonsteroids_alter_extend_theme_wrappers_property_with_suggestions(
+    $block_array,
+    $suggestions_parts);
 }
 
 /**
